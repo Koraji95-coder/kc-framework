@@ -8,6 +8,8 @@
   "./ipc": "./src/ipc/backend.js",
   "./splash": "./src/splash/index.jsx",
   "./updater": "./src/updater/index.jsx",
+  "./activation": "./src/activation/ActivationGate.jsx",
+  "./activation/hook": "./src/activation/useActivation.js",
   "./components/UpdateModal": "./src/components/UpdateModal/UpdateModal.jsx",
   "./components/ReleaseNotes": "./src/components/ReleaseNotes/ReleaseNotes.jsx",
   "./utils/version": "./src/utils/version.js",

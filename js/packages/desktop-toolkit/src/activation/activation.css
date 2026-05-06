@@ -1,0 +1,191 @@
+/* activation.css — PIN activation gate (Chamber 19 design system) */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Root ────────────────────────────────────────────────────────────────── */
+.activation-root {
+  position: fixed;
+  inset: 0;
+  background: #1C1B19;
+  color: #f0ede8;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  z-index: 9999;
+  padding: 32px;
+  user-select: none;
+}
+
+/* Faint diagonal hatching */
+.activation-root::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(196, 136, 77, 0.03) 0px,
+    rgba(196, 136, 77, 0.03) 1px,
+    transparent 1px,
+    transparent 8px
+  );
+  pointer-events: none;
+}
+
+.activation-root > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Anvil mark ──────────────────────────────────────────────────────────── */
+.activation-logo {
+  width: 48px;
+  height: 48px;
+  opacity: 0.9;
+}
+
+/* ── Card ────────────────────────────────────────────────────────────────── */
+.activation-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(196, 136, 77, 0.18);
+  border-radius: 8px;
+  padding: 28px 32px;
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Heading ─────────────────────────────────────────────────────────────── */
+.activation-heading {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: #f0ede8;
+  letter-spacing: 0.01em;
+}
+
+.activation-subtext {
+  font-size: 12px;
+  line-height: 1.55;
+  color: rgba(240, 237, 232, 0.55);
+  margin-top: -12px;
+}
+
+/* ── Input row ───────────────────────────────────────────────────────────── */
+.activation-input-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.activation-input-label span {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: rgba(196, 136, 77, 0.8);
+  text-transform: uppercase;
+}
+
+.activation-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 9px 12px;
+  color: #f0ede8;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 15px;
+  letter-spacing: 0.12em;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.activation-input:focus {
+  border-color: rgba(196, 136, 77, 0.55);
+}
+
+.activation-input::placeholder {
+  color: rgba(240, 237, 232, 0.2);
+  letter-spacing: 0.04em;
+}
+
+/* ── Button ──────────────────────────────────────────────────────────────── */
+.activation-btn {
+  width: 100%;
+  padding: 10px 16px;
+  background: #C4884D;
+  border: none;
+  border-radius: 4px;
+  color: #1C1B19;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.activation-btn:hover:not(:disabled) {
+  background: #d4986d;
+}
+
+.activation-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Error ───────────────────────────────────────────────────────────────── */
+.activation-error {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  color: #B85C5C;
+  line-height: 1.45;
+  padding: 8px 10px;
+  background: rgba(184, 92, 92, 0.08);
+  border: 1px solid rgba(184, 92, 92, 0.25);
+  border-radius: 4px;
+}
+
+/* ── Warning banner (near expiry) ───────────────────────────────────────── */
+.activation-warning-banner {
+  font-size: 12px;
+  color: #C4A24D;
+  line-height: 1.5;
+  padding: 8px 10px;
+  background: rgba(196, 162, 77, 0.08);
+  border: 1px solid rgba(196, 162, 77, 0.25);
+  border-radius: 4px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+/* ── Spinner ─────────────────────────────────────────────────────────────── */
+.activation-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(196, 136, 77, 0.25);
+  border-top-color: #C4884D;
+  border-radius: 50%;
+  animation: activation-spin 0.75s linear infinite;
+  flex-shrink: 0;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+@keyframes activation-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .activation-spinner { animation: none; border-top-color: #C4884D; }
+}
