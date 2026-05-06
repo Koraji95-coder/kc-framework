@@ -21,7 +21,7 @@
   "files": ["src", "build-scripts", "installer"],
   "dependencies": {
     "dompurify": "^3.4.2",
-    "marked": "^18.0.2"
+    "marked": "^18.0.3"
   },
   "peerDependencies": {
     "react": ">=18",
