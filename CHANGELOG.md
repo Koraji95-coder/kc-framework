@@ -48,6 +48,23 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - `useShowOnReady()` — React hook; call at the root of your component tree.
   Both are no-ops outside a Tauri context (e.g. Vite dev in a browser).
 
+- Machine-bound PIN activation system: Rust backend (`toolkit_check_activation`,
+  `toolkit_activation_status`, `toolkit_activate_with_pin`, `toolkit_deactivate`
+  Tauri commands) that verifies a signed token is bound to the current machine.
+  Token stores licensee name, expiry, and an HMAC over the machine fingerprint.
+
+- `ActivationGate` component (`@chamber-19/desktop-toolkit/activation`): full-screen
+  PIN entry gate that wraps the app root. Shows a PIN form on unactivated machines,
+  renders children once activation succeeds, and surfaces an expiry-warning banner
+  within 5 days of token expiry.
+
+- `useActivation` hook (`@chamber-19/desktop-toolkit/activation/hook`): exposes
+  `{ activated, checking, warning, daysRemaining, result, activate, deactivate, recheck }`
+  for use in settings panels or anywhere that needs to read or change activation state.
+
+- `scripts/generate_key.py`: administrator utility for generating signed activation
+  PINs for a named licensee with a configurable expiry date.
+
 ## [2.2.8] — 2026-04-24
 
 ### Changed

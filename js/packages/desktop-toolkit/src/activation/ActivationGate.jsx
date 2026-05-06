@@ -142,8 +142,7 @@ function ExpiryWarning({ daysRemaining }) {
 
 // ── Gate ──────────────────────────────────────────────────────────────────
 export function ActivationGate({ children }) {
-  const { activated, checking, warning, daysRemaining } = useActivation();
-  const [localActivated, setLocalActivated] = useState(false);
+  const { activated, checking, warning, daysRemaining, recheck } = useActivation();
 
   // Non-Tauri context: always pass through (Vite dev, Storybook, etc.)
   if (!isTauri) return children;
@@ -154,8 +153,8 @@ export function ActivationGate({ children }) {
     return <div className="activation-root" aria-label="Loading…" />;
   }
 
-  if (!activated && !localActivated) {
-    return <PinForm onSuccess={() => setLocalActivated(true)} />;
+  if (!activated) {
+    return <PinForm onSuccess={recheck} />;
   }
 
   return (
