@@ -6,6 +6,17 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [2.3.1] — 2026-05-06
+
+### Fixed
+
+- **`ActivationGate` race condition:** on already-activated machines the
+  component briefly flashed the full-screen PIN form before the activation
+  check completed. The blank loading screen is now shown while `checking` is
+  `true`, preventing any visible PIN-form flash. `recheck` is also now
+  forwarded from `useActivation` so callers (settings panels, etc.) can
+  trigger a re-check after external state changes.
+
 ### Changed
 
 - Pinned `softprops/action-gh-release` to `v3.0.0` (Node 24 runtime) in
