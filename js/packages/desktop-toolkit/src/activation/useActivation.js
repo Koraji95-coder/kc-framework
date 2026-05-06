@@ -74,5 +74,5 @@ export function useActivation() {
     setResult(null);
   }, []);
 
-  return { activated, checking, warning, daysRemaining, result, activate, deactivate };
+  return { activated, checking, warning, daysRemaining, result, activate, deactivate, recheck: refresh };
 }
