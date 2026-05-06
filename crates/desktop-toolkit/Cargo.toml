@@ -19,4 +19,5 @@ hmac = "0.12"
 sha2 = "0.10"
 base64 = "0.22"
 reqwest = { version = "0.13", features = ["json"] }
+litcrypt2 = "0.1"
 

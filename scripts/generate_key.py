@@ -2,19 +2,28 @@
 """
 generate_key.py — Generate a new Chamber 19 activation PIN.
 
-Prints the JSON entry ready to paste into the Drive auth file under "keys".
+Prints the plaintext PIN (to share with the engineer) and the JSON entry
+ready to paste into the Drive auth file under "keys".  Drive file keys are
+HMAC-SHA256(pin, PIN_HASH_SECRET) so the plaintext PIN is never stored in
+the Drive file.
 
 Usage:
     python scripts/generate_key.py --name "Alice Johnson" --expires "2026-12-31"
+
+The PIN_HASH_SECRET is read from the ACTIVATION_PIN_HASH_SECRET environment
+variable.  Pass --pin-hash-secret to override (useful in CI).
 
 The PIN format is R3P-XXXX-XXXX where X is an uppercase alphanumeric character.
 Prefix R3P identifies the key format version and makes PINs visually distinct.
 """
 
 import argparse
+import hashlib
+import hmac as hmac_lib
 import json
-import random
+import os
 import re
+import secrets
 import string
 from datetime import date
 
@@ -27,10 +36,18 @@ NUM_SEGMENTS = 2
 
 def generate_pin() -> str:
     segments = [
-        "".join(random.choices(ALPHABET, k=SEGMENT_LEN))
+        "".join(secrets.choice(ALPHABET) for _ in range(SEGMENT_LEN))
         for _ in range(NUM_SEGMENTS)
     ]
     return f"{PIN_PREFIX}-{'-'.join(segments)}"
+
+
+def hash_pin(pin: str, secret: str) -> str:
+    return hmac_lib.new(
+        secret.encode(),
+        pin.encode(),
+        hashlib.sha256,
+    ).hexdigest()
 
 
 def validate_expires(value: str) -> str:
@@ -63,9 +80,21 @@ def main() -> None:
         type=validate_expires,
         help="Expiry date in YYYY-MM-DD format",
     )
+    parser.add_argument(
+        "--pin-hash-secret",
+        default=os.environ.get("ACTIVATION_PIN_HASH_SECRET", ""),
+        help="HMAC secret used to hash PINs (default: $ACTIVATION_PIN_HASH_SECRET)",
+    )
     args = parser.parse_args()
 
+    if not args.pin_hash_secret:
+        parser.error(
+            "ACTIVATION_PIN_HASH_SECRET is not set.\n"
+            "Export it before running, or pass --pin-hash-secret."
+        )
+
     pin = generate_pin()
+    pin_key = hash_pin(pin, args.pin_hash_secret)
     today = date.today().isoformat()
 
     entry = {
@@ -75,11 +104,12 @@ def main() -> None:
         "expires": args.expires,
     }
 
-    print(f"\nNew PIN: {pin}\n")
+    print(f"\nPlaintext PIN (share via secure channel): {pin}\n")
     print("Paste this into your Drive auth file under the top-level \"keys\" object:\n")
-    print(json.dumps({pin: entry}, indent=2))
+    print(json.dumps({pin_key: entry}, indent=2))
     print()
-    print("Then share the PIN with the engineer via a secure channel.")
+    print("The key above is HMAC-SHA256(pin, PIN_HASH_SECRET).")
+    print("The plaintext PIN is never written to the Drive file.")
 
 
 if __name__ == "__main__":

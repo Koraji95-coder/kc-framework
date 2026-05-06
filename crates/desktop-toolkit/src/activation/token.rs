@@ -18,13 +18,6 @@ use tauri::Manager;
 
 use super::ActivationResult;
 
-// ── Compile-time secrets ──────────────────────────────────────────────────
-
-const ACTIVATION_HMAC_SECRET: &str = match option_env!("ACTIVATION_HMAC_SECRET") {
-    Some(s) => s,
-    None => "dev-only-insecure-hmac-key-DO-NOT-SHIP",
-};
-
 /// Hard expiry: tokens are valid for this many days from issuance.
 pub const ACTIVATION_GRACE_DAYS: i64 = 30;
 /// Warning threshold: surface a warning this many days before expiry.
@@ -63,7 +56,8 @@ fn sign_fields(
     expires_at: &str,
 ) -> String {
     let message = format!("{machine_id}|{name}|{pin_hash}|{issued_at}|{expires_at}");
-    let mut mac = HmacSha256::new_from_slice(ACTIVATION_HMAC_SECRET.as_bytes())
+    let secret = super::hmac_secret();
+    let mut mac = HmacSha256::new_from_slice(secret.as_bytes())
         .expect("HMAC accepts any key length");
     mac.update(message.as_bytes());
     STANDARD.encode(mac.finalize().into_bytes())
