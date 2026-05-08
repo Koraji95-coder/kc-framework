@@ -6,6 +6,25 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [2.3.2] — 2026-05-08
+
+### Notes
+
+- **Re-publish of v2.3.1 content.** The `v2.3.1` tag was mistakenly pushed
+  to the pre-version-bump commit (`7456b43`), where `package.json` still read
+  `2.3.0`. The publish workflow's version-match guard aborted before the npm
+  package was uploaded or a GitHub Release was created. No API or behavior
+  changes relative to the v2.3.1 changelog entry — this patch simply ensures
+  the npm package and GitHub Release exist for the `ActivationGate` / PIN
+  activation system introduced in v2.3.0.
+
+- **Spurious `v6.2.2` tag** is present in this repository but belongs to
+  `chamber-19/transmittal-builder`. It was accidentally pushed here on
+  2026-04-21, points to a commit with no corresponding changelog entry, and
+  has no GitHub Release. It cannot be removed via the publish workflow; a
+  repository maintainer must delete it manually from the GitHub UI or via the
+  API (`DELETE /repos/chamber-19/desktop-toolkit/git/refs/tags/v6.2.2`).
+
 ## [2.3.1] — 2026-05-06
 
 ### Fixed
