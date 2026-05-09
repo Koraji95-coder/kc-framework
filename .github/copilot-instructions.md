@@ -11,6 +11,12 @@ repo-specific source of truth.
 - Rust crates live under `crates/`.
 - Published JS package lives under `js/packages/desktop-toolkit/`.
 - Python package lives under `python/`.
+- **Activation service** (`python/chamber19_desktop_toolkit/activation.py`) provides:
+  - Office IP gating
+  - PIN generation and validation
+  - Hardware fingerprinting and token signing
+  - Token expiry and revalidation
+  - Audit logging
 - Tauri consumer templates and release workflow templates live in this repo.
 
 ## Build And Test
@@ -37,8 +43,10 @@ pip install -e .
 
 - Changes to templates or release workflows are consumer-facing and require
   `docs/CONSUMING.md` updates.
+- Activation service changes (schema, endpoints, security) require updates to
+  docstrings and consumer docs (e.g., `launcher` README).
 - NSIS hook changes must keep root and packaged copies byte-identical.
-- User-facing API, installer, updater, or template behavior changes require a
-  `CHANGELOG.md` entry.
+- User-facing API, installer, updater, template, or activation behavior changes
+  require a `CHANGELOG.md` entry.
 
 Path-specific rules live under `.github/instructions/`.

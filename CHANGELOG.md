@@ -6,6 +6,29 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Added
+
+- **Activation service** (Python FastAPI in `python/chamber19_desktop_toolkit/activation.py`):
+  - Office IP gating for PIN requests
+  - Single-use PIN generation and validation
+  - Hardware fingerprinting (hostname + Windows SID + MAC) with SHA256 hashing
+  - HMAC-SHA256 token signing for offline validation
+  - Token expiry (14-day default) with forced revalidation
+  - Machine revocation (admin) capability
+  - Audit logging of all activation attempts
+  - Endpoints:
+    - `POST /enrollment/request-pin` — request PIN (office IP only)
+    - `POST /enrollment/activate` — activate with PIN + hardware
+    - `POST /activation/validate-token` — validate token on app startup
+    - `POST /admin/revoke-machine` — revoke machine (admin)
+    - `GET /admin/audit-log` — view audit trail (admin)
+
+### Changed
+
+- `launcher` now depends on activation service for PIN/hardware/token logic
+- Consumer apps (`transmittal-builder`, etc.) no longer embed activation; they
+  call toolkit activation service via HTTP from launcher
+
 ## [2.3.2] — 2026-05-08
 
 ### Notes
