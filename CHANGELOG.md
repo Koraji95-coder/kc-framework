@@ -8,6 +8,25 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Added
 
+- **`@chamber-19/stylelint-config`** — new shared stylelint config package at
+  `js/packages/stylelint-config-chamber19/`. Enforces the CSS_DISCIPLINE.md
+  rules across consumer apps and the toolkit itself. Every error message
+  references `chamber-19/.github → docs/skills/CSS_DISCIPLINE.md` so authors
+  and AI agents have a clear path back to the canonical rule. Rules:
+  - `color-no-hex` — direct hex colors disallowed outside token files
+  - `declaration-no-important` — `!important` disallowed
+  - `selector-max-type: 0` — naked element selectors disallowed in component CSS
+  - `selector-class-pattern` — kebab-case (BEM modifiers allowed)
+  - `custom-property-pattern` — `--ch-*` / `--component-name` / `--_internal`
+  - Plus all `stylelint-config-standard` rules
+  - Per-file overrides exempt `_tokens.css`, `_theme.override.css`, `_reset.css`,
+    and the toolkit's in-flight token-extraction CSS (splash, ReleaseNotes,
+    UpdateModal, activation, updater) — exemptions removed once those sweep.
+- Toolkit's own `js/packages/desktop-toolkit/.stylelintrc.json` extends the new
+  config so toolkit CSS is checked first. New `lint:css` / `lint:css:fix`
+  scripts at both the package and monorepo-root levels. Devdeps added:
+  `stylelint`, `stylelint-config-standard`, and the local workspace config.
+
 - **Activation service** (Python FastAPI in `python/chamber19_desktop_toolkit/activation.py`):
   - Office IP gating for PIN requests
   - Single-use PIN generation and validation
