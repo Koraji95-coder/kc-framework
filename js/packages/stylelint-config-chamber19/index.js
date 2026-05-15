@@ -128,7 +128,6 @@ export default {
     // ── Toolkit-owned splash CSS ──────────────────────────────────────
     // The splash uses hardcoded forge-brand colors that don't yet map to
     // --ch-* tokens. Grandfathered until the token sweep extracts them.
-    // Tracked: chamber-19/desktop-toolkit#TODO (splash token extraction).
     {
       files: ["**/splash/splash.css"],
       rules: {
@@ -138,7 +137,7 @@ export default {
 
     // ── Toolkit-owned ReleaseNotes CSS ────────────────────────────────
     // Markdown-rendering styles use hex for now. Grandfathered until token
-    // sweep. Tracked: chamber-19/desktop-toolkit#TODO.
+    // sweep.
     {
       files: ["**/components/ReleaseNotes/ReleaseNotes.css"],
       rules: {
