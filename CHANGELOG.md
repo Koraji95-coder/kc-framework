@@ -21,7 +21,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - Plus all `stylelint-config-standard` rules
   - Per-file overrides exempt `_tokens.css`, `_theme.override.css`, `_reset.css`,
     and the toolkit's in-flight token-extraction CSS (splash, ReleaseNotes,
-    UpdateModal, activation, updater) — exemptions removed once those sweep.
+    UpdateModal, activation, updater) — exemptions removed once those sweeps complete.
 - Toolkit's own `js/packages/desktop-toolkit/.stylelintrc.json` extends the new
   config so toolkit CSS is checked first. New `lint:css` / `lint:css:fix`
   scripts at both the package and monorepo-root levels. Devdeps added:
