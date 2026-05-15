@@ -1,0 +1,42 @@
+{
+  "name": "@chamber-19/stylelint-config",
+  "version": "0.1.0",
+  "description": "Shared stylelint config for Chamber 19 — enforces CSS_DISCIPLINE.md rules across consumer apps and the toolkit itself",
+  "license": "MIT",
+  "type": "module",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "stylelint": ">=16.0.0"
+  },
+  "dependencies": {
+    "stylelint-config-standard": "^36.0.1"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "stylelint",
+    "stylelint-config",
+    "chamber-19",
+    "css",
+    "design-system",
+    "discipline"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chamber-19/desktop-toolkit.git",
+    "directory": "js/packages/stylelint-config-chamber19"
+  },
+  "bugs": {
+    "url": "https://github.com/chamber-19/desktop-toolkit/issues"
+  },
+  "homepage": "https://github.com/chamber-19/desktop-toolkit/tree/main/js/packages/stylelint-config-chamber19#readme"
+}

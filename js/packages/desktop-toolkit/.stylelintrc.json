@@ -1,0 +1,3 @@
+{
+  "extends": ["@chamber-19/stylelint-config"]
+}

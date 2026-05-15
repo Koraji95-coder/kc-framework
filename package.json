@@ -7,6 +7,10 @@
   "workspaces": [
     "js/packages/*"
   ],
+  "scripts": {
+    "lint:css": "npm run lint:css --workspace @chamber-19/desktop-toolkit",
+    "lint:css:fix": "npm run lint:css:fix --workspace @chamber-19/desktop-toolkit"
+  },
   "engines": {
     "node": ">=20"
   }

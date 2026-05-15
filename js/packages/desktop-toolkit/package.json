@@ -23,6 +23,10 @@
     "build-scripts",
     "installer"
   ],
+  "scripts": {
+    "lint:css": "stylelint \"src/**/*.{css,scss}\" --max-warnings 0",
+    "lint:css:fix": "stylelint \"src/**/*.{css,scss}\" --fix"
+  },
   "dependencies": {
     "dompurify": "^3.4.2",
     "marked": "^18.0.3"
@@ -30,6 +34,11 @@
   "peerDependencies": {
     "react": ">=18",
     "react-dom": ">=18"
+  },
+  "devDependencies": {
+    "@chamber-19/stylelint-config": "workspace:*",
+    "stylelint": "^16.10.0",
+    "stylelint-config-standard": "^36.0.1"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
