@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "@chamber-19/stylelint-config": "*",
-    "stylelint": "^16.10.0",
+    "stylelint": "^17.11.1",
     "stylelint-config-standard": "^40.0.0"
   },
   "publishConfig": {
