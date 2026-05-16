@@ -13,7 +13,7 @@
     "stylelint": ">=16.0.0"
   },
   "dependencies": {
-    "stylelint-config-standard": "^36.0.1"
+    "stylelint-config-standard": "^40.0.0"
   },
   "engines": {
     "node": ">=20"
