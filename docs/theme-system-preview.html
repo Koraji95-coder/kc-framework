@@ -1,0 +1,1359 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chamber-19 Theme System Preview</title>
+  <!-- Google Fonts — primary triad + alternates.
+       Tauri CSP note: connect-src must allow https://fonts.googleapis.com and
+       https://fonts.gstatic.com. Offline / air-gap builds should swap these
+       @import lines for bundled @font-face rules. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <style>
+    /* Primary triad (Chamber-19 design-system spec) */
+    @import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap");
+    @import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap");
+    @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+    /* Display alternates — uncomment in consumer apps to swap display family */
+    @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap");
+    @import url("https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap");
+
+    :root {
+      --ch-bg: #1C1B19;
+      --ch-surface: #2B2926;
+      --ch-text: #EFEAE2;
+      --ch-muted: #A39A8D;
+      --ch-accent: #C4884D;
+      --ch-accentText: #1C1B19;
+      --ch-border: #4A4238;
+      --ch-success: #6B9E6B;
+      --ch-warning: #C4A24D;
+      --ch-error: #B85C5C;
+      --ch-info: #5C8EB8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: var(--ch-font-ui);
+      color: var(--ch-text);
+      background:
+        radial-gradient(1000px 600px at 15% -10%, color-mix(in srgb, var(--ch-accent) 18%, transparent), transparent 60%),
+        linear-gradient(180deg, var(--ch-bg), color-mix(in srgb, var(--ch-bg) 80%, black 20%));
+      min-height: 100vh;
+    }
+
+    .shell {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 32px 20px 50px;
+      display: grid;
+      grid-template-columns: minmax(280px, 360px) 1fr;
+      gap: 18px;
+    }
+
+    .panel {
+      background: color-mix(in srgb, var(--ch-surface) 92%, black 8%);
+      border: 1px solid var(--ch-border);
+      border-radius: 14px;
+      box-shadow: 0 16px 30px rgba(0, 0, 0, 0.28);
+      overflow: hidden;
+    }
+
+    .controls {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: fit-content;
+      position: sticky;
+      top: 16px;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: 20px; letter-spacing: 0.03em; }
+
+    .sub {
+      color: var(--ch-muted);
+      font-size: 13px;
+      line-height: 1.45;
+      margin-top: 8px;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--ch-muted);
+    }
+
+    select, input[type="text"] {
+      border: 1px solid var(--ch-border);
+      background: var(--ch-bg);
+      color: var(--ch-text);
+      padding: 9px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      width: 100%;
+    }
+
+    .checkbox {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-direction: row;
+      color: var(--ch-text);
+    }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .color-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    input[type="color"] {
+      width: 38px;
+      height: 30px;
+      border: 1px solid var(--ch-border);
+      border-radius: 8px;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .preview {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--ch-border);
+      padding-bottom: 10px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--ch-border);
+      background: color-mix(in srgb, var(--ch-bg) 88%, black 12%);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 11px;
+      color: var(--ch-muted);
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      border: 1px solid var(--ch-border);
+      border-radius: 12px;
+      background: var(--ch-surface);
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .muted { color: var(--ch-muted); font-size: 13px; }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 8px;
+      padding: 9px 12px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .btn.primary { background: var(--ch-accent); color: var(--ch-accentText); }
+    .btn.info { background: var(--ch-info); color: #fff; }
+    .btn.success { background: var(--ch-success); color: #fff; }
+    .btn.warning { background: var(--ch-warning); color: #2a2118; }
+    .btn.error { background: var(--ch-error); color: #fff; }
+
+    .notice {
+      border-radius: 10px;
+      border: 1px solid color-mix(in srgb, var(--ch-warning) 70%, var(--ch-border));
+      background: color-mix(in srgb, var(--ch-warning) 18%, transparent);
+      color: var(--ch-warning);
+      padding: 10px;
+      font-size: 12px;
+    }
+
+    .living {
+      border-top: 1px dashed var(--ch-border);
+      padding-top: 10px;
+      color: var(--ch-muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    /* ─── App-shell scaffold ─────────────────────────────────────────────
+       L-shape chrome (sidebar + topbar form one continuous surface)
+       wrapping a scrollable content area. The chrome stays put as you
+       scroll; the content slides under it. No scrollbars rendered.
+       Consumer apps inherit this skeleton via --ch-* tokens. */
+    .scaffold-panel {
+      grid-column: 1 / -1;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .scaffold-frame {
+      --scaffold-sidebar-width: 238px;
+      --scaffold-topbar-height: 62px;
+      position: relative;
+      display: grid;
+      grid-template-columns: var(--scaffold-sidebar-width) 1fr;
+      height: 620px;
+      isolation: isolate;
+      /* Surfaces stay solid. Sidebar at --ch-bg, topbar at --ch-bg,
+         workspace at --ch-content-bg. Chrome→workspace transition is
+         handled solely by --ch-workspace-blend painted on the workspace
+         background. No bridge seams, no corner anchor — those compounded
+         as visible "treated zones" near the L-corner. */
+    }
+
+    .scaffold-sidebar {
+      display: flex;
+      flex-direction: column;
+      background: var(--ch-bg);
+      /* No border — the workspace blend on the workspace background
+         handles the chrome→content transition. Any explicit border
+         here would re-introduce a hard seam line. */
+      overflow: visible;
+      z-index: 2;
+    }
+
+    .scaffold-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 18px 16px;
+      flex-shrink: 0;
+      /* No bottom border — the L stays seamless. The sidebar nav sits
+         directly under the brand with breathing room instead of a rule. */
+    }
+
+    .scaffold-brand-orb {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--ch-accent), color-mix(in srgb, var(--ch-accent) 60%, var(--ch-error)));
+      /* Neutral black shadow only — no accent halo. Avoids creating
+         a warm "hot spot" near the L-corner. */
+      box-shadow: 0 2px 6px rgb(0 0 0 / 0.22);
+      font-family: var(--ch-font-display);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--ch-accentText);
+    }
+
+    .scaffold-brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .scaffold-brand-name {
+      font-family: var(--ch-font-display);
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--ch-text);
+      letter-spacing: 0.01em;
+      line-height: 1.1;
+    }
+
+    .scaffold-brand-tag {
+      font-family: var(--ch-font-mono);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--ch-accent) 80%, var(--ch-muted));
+    }
+
+    .scaffold-nav {
+      flex: 1;
+      padding: 12px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      overflow-y: auto;
+      /* Hide scrollbar entirely — sidebar feels clean even with many items. */
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      min-height: 0;
+    }
+
+    .scaffold-nav::-webkit-scrollbar { display: none; }
+
+    /* ── Sidebar profile block — pinned to bottom, expandable ────────────
+       Designed as the "bottom slot" for per-app identity. The
+       expandable container can take more children (avatar, status,
+       app-specific badges) without breaking the layout — additions
+       grow the bottom block upward and the nav above re-flows. */
+    .scaffold-profile {
+      flex-shrink: 0;
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 14px 16px 16px;
+      /* No top border — the profile block reads as part of the same
+         sidebar surface. Spacing alone separates it from the nav. */
+    }
+
+    .scaffold-profile-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .scaffold-profile-avatar {
+      width: 32px;
+      height: 32px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, color-mix(in srgb, var(--ch-accent) 70%, var(--ch-surface)), color-mix(in srgb, var(--ch-accent) 30%, var(--ch-bg)));
+      border: 1px solid color-mix(in srgb, var(--ch-accent) 40%, var(--ch-border));
+      color: var(--ch-accentText);
+      font-family: var(--ch-font-ui);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .scaffold-profile-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .scaffold-profile-name {
+      font-family: var(--ch-font-ui);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ch-text);
+      letter-spacing: -0.005em;
+      line-height: 1.2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .scaffold-profile-meta {
+      font-family: var(--ch-font-mono);
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--ch-muted);
+    }
+
+    /* Per-app extension slot. Consumer apps can drop extra children
+       (status chips, app-specific KPI, etc.) — flex layout grows
+       upward without breaking the L. */
+    .scaffold-profile-extension {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    /* Eyebrow + hairline pattern: each section header gets a small mono
+       label and a subtle hairline underneath, anchoring the section
+       without forcing a divider between every nav item. The diamond
+       divider still separates GROUPS. This scales cleanly — a sidebar
+       with 1 group or 7 groups both read crisply. */
+    .scaffold-nav-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px 6px;
+      margin-bottom: 4px;
+      font-family: var(--ch-font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--ch-muted) 80%, var(--ch-accent) 20%);
+    }
+
+    .scaffold-nav-eyebrow::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--ch-border) 55%, transparent),
+        color-mix(in srgb, var(--ch-border) 15%, transparent) 80%,
+        transparent
+      );
+    }
+
+    .scaffold-nav-item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--ch-muted);
+      font-family: var(--ch-font-ui);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: -0.005em;
+      text-align: left;
+      cursor: pointer;
+      outline: none;
+      transition: background 140ms ease, color 140ms ease, border-color 140ms ease;
+    }
+
+    /* Hover: subtle bg lift, brighter text. No accent ring — that's
+       reserved for focus-visible so mouse hover and keyboard focus
+       are visually distinct. */
+    .scaffold-nav-item:hover {
+      background: color-mix(in srgb, var(--ch-surface) 70%, transparent);
+      color: var(--ch-text);
+    }
+
+    /* Focus-visible: accent outline ring for keyboard navigation.
+       Distinct from hover so screen reader / keyboard users see a
+       clear "focused" affordance. Only fires for keyboard focus, not
+       mouse focus, thanks to :focus-visible. */
+    .scaffold-nav-item:focus-visible {
+      outline: 2px solid var(--ch-accent);
+      outline-offset: 2px;
+    }
+
+    /* Active item: warm wash bg + 1px accent-tinted border + a small
+       left rail indicator (::before). The rail replaces the old full-
+       height inset stripe and the redundant outer black outline — one
+       clear "selected" signal instead of three competing ones. Full
+       4-sided border-radius. */
+    .scaffold-nav-item.active {
+      background: var(--ch-active-bg);
+      border-color: color-mix(in srgb, var(--ch-accent) 42%, transparent);
+      color: var(--ch-text);
+      /* border-radius inherited from .scaffold-nav-item (10px all sides) */
+    }
+
+    .scaffold-nav-item.active::before {
+      content: "";
+      position: absolute;
+      left: 5px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 60%;
+      border-radius: 2px;
+      background: var(--ch-accent);
+      pointer-events: none;
+    }
+
+    /* ── Chrome / sidebar divider ─────────────────────────────────────
+       Decorative diamond divider. Used inside the sidebar to separate
+       nav groups (workspace / tools / etc). May carry brand character —
+       part of the app chrome, not the content. Slightly more vertical
+       breathing room above and below than before; reads as a deliberate
+       group break rather than a tight squeeze. */
+    .scaffold-nav-divider {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 10px;
+      margin: 16px 12px 14px;
+      opacity: 0.72;
+    }
+
+    .scaffold-nav-divider::before,
+    .scaffold-nav-divider::after {
+      content: "";
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        color-mix(in srgb, var(--ch-accent) 25%, var(--ch-border)),
+        transparent
+      );
+    }
+
+    .scaffold-nav-divider span {
+      width: 6px;
+      height: 6px;
+      transform: rotate(45deg);
+      border-radius: 1.5px;
+      border: 1px solid color-mix(in srgb, var(--ch-accent) 40%, var(--ch-border));
+      background: color-mix(in srgb, var(--ch-accent) 18%, var(--ch-surface));
+    }
+
+    /* Content divider — optional reusable utility for workspace content.
+       Soft 1px accent line. Consumer apps opt in when they want a subtle
+       visual pause between sections. No layout dependency; placement in
+       a grid is handled by the grid owner (e.g. .dashboard-grid > .content-divider).
+       Never apply globally — keep section spacing as the primary rhythm. */
+    .content-divider {
+      height: 1px;
+      margin: 28px 0;
+      background: var(--ch-content-divider);
+    }
+
+    .scaffold-workspace {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      /* Content-bg is the base. The workspace-blend background-image
+         layers chrome colors (sidebar-bg at left, topbar-bg at top) at
+         low alpha that fades to transparent within ~220px / ~140px —
+         so the workspace's top + left edges literally PICK UP the
+         chrome's color rather than being dimmed by a black inset.
+         A subtle accent radial at (0,0) adds corner warmth. No box-
+         shadow — color is doing all the blending. */
+      background:
+        var(--ch-workspace-blend),
+        var(--ch-content-bg);
+      overflow-y: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      z-index: 1;
+    }
+
+    .scaffold-workspace::-webkit-scrollbar { display: none; }
+
+    /* Three-zone topbar grid: left = page title, center = optional app
+       context slot, right = optional app slots + shell controls (theme
+       + clock). Slots render cleanly when empty — `auto` tracks
+       collapse to nothing, `1fr` center track absorbs the leftover. */
+    .scaffold-topbar {
+      position: sticky;
+      top: 0;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 22px;
+      height: var(--scaffold-topbar-height);
+      padding: 0 22px;
+      /* Solid --ch-bg chrome. The workspace blend below handles the
+         seam-into-workspace transition — no bridge needed. */
+      background: var(--ch-bg);
+      flex-shrink: 0;
+      z-index: 3;
+    }
+
+    /* ── Topbar zone: left ────────────────────────────────────────────
+       Page title + optional sub-title (deferred — slot defined here,
+       no UI rendered without app data). */
+    .scaffold-topbar-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .scaffold-topbar-title {
+      font-family: var(--ch-font-display);
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--ch-text);
+      letter-spacing: 0.01em;
+      line-height: 1.15;
+    }
+
+    /* ── Topbar zone: center ──────────────────────────────────────────
+       Optional app context slot. Empty by default. Apps fill this
+       with breadcrumbs, project pickers, filter bars, etc. When empty
+       the slot is invisible (flex with no children = no paint). */
+    .scaffold-topbar-center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      min-width: 0;
+      /* No padding / border / bg — slot is inert until an app fills it. */
+    }
+
+    /* ── Topbar zone: right ───────────────────────────────────────────
+       Right cluster contains, in order:
+         1. App quick-action slot (.scaffold-topbar-app-actions) — empty
+            by default; apps inject 1-2 text-only buttons (e.g. "+ New
+            transmittal", "Export"). No icons added by shell.
+         2. App status slot (.scaffold-topbar-app-status) — empty by
+            default; reserved for backend/sync/offline pill. Shell
+            doesn't render fake status data.
+         3. Shell theme pill — always present.
+         4. Shell clock — always present.
+       Empty slots collapse to zero width via :empty selector. */
+    .scaffold-topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .scaffold-topbar-app-actions,
+    .scaffold-topbar-app-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .scaffold-topbar-app-actions:empty,
+    .scaffold-topbar-app-status:empty {
+      display: none;
+    }
+
+    /* Kept for back-compat — the shell theme + clock cluster previously
+       lived under .scaffold-topbar-actions. New markup puts theme + clock
+       directly under .scaffold-topbar-right; keep this rule available
+       for any callers that haven't migrated yet. */
+    .scaffold-topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .scaffold-topbar-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border: 1px solid var(--ch-accent);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--ch-accent) 14%, var(--ch-surface));
+      color: var(--ch-accent);
+      font-family: var(--ch-font-ui);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .scaffold-topbar-pill::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--ch-accent);
+    }
+
+    .scaffold-topbar-clock {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      line-height: 1.15;
+    }
+
+    .scaffold-clock-date {
+      font-family: var(--ch-font-mono);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--ch-muted);
+    }
+
+    .scaffold-clock-time {
+      font-family: var(--ch-font-mono);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: var(--ch-text);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       OPTIONAL CONTENT UTILITIES
+       ═══════════════════════════════════════════════════════════════════
+       These are reusable utility classes that any consumer app can OPT
+       INTO. They are NOT part of the shell. Apps that want a different
+       rhythm (tables, forms, file browsers, settings panels, etc.) skip
+       these entirely and use their own classes. The shell does not force
+       any content layout.
+       ─────────────────────────────────────────────────────────────────── */
+
+    /* Section heading with trailing accent line. Drop in via
+       <h3 class="section-heading">Title</h3>. The flex+::after gives
+       you the soft accent stroke for free. No layout dependency. */
+    .section-heading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 8px 0 0;
+      font-family: var(--ch-font-display);
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--ch-text);
+      letter-spacing: 0.01em;
+    }
+
+    .section-heading::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--ch-section-title-accent);
+    }
+
+    /* Section paragraph. Optional. Drop in via
+       <p class="section-paragraph">…</p>. Constrains line length to a
+       readable measure (60ch). No layout dependency. */
+    .section-paragraph {
+      font-family: var(--ch-font-ui);
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--ch-muted);
+      max-width: 60ch;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       DASHBOARD-SPECIFIC CONTENT
+       ═══════════════════════════════════════════════════════════════════
+       The classes below are ONE EXAMPLE of how an app fills the workspace.
+       The Dashboard app uses a 2-column grid of metric cards. Future apps
+       — Transmittals (tables/queues), Drawings (file browser), Settings
+       (grouped panels), Activation (status UI) — are free to define their
+       own internal layout without inheriting anything from here.
+
+       If you find yourself reaching for these classes in a non-dashboard
+       app, that's a signal the pattern should be extracted into a generic
+       utility instead of being copied. Promote to a `.ch-*` utility class
+       under "Optional content utilities" above, OR keep it app-local.
+       ─────────────────────────────────────────────────────────────────── */
+
+    .dashboard-grid {
+      padding: 22px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      align-content: start;
+    }
+
+    /* Section heading + paragraph inside the dashboard grid span full
+       width. Scoped to the grid so the utilities themselves stay
+       layout-agnostic. */
+    .dashboard-grid > .section-heading,
+    .dashboard-grid > .section-paragraph,
+    .dashboard-grid > .content-divider {
+      grid-column: 1 / -1;
+    }
+
+    .dashboard-tile {
+      border: 1px solid var(--ch-panel-border);
+      border-radius: 10px;
+      padding: 14px;
+      /* Panels lift to --ch-panel-bg (close to surface), making them
+         visually raised above the content-bg workspace. Subtle box-
+         shadow gives depth without heaviness. */
+      background: var(--ch-panel-bg);
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.03),
+        0 8px 18px -12px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .dashboard-tile-label {
+      font-family: var(--ch-font-mono);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ch-muted);
+    }
+
+    .dashboard-tile-value {
+      font-family: var(--ch-font-display);
+      font-size: 24px;
+      color: var(--ch-text);
+      line-height: 1.1;
+    }
+
+    .dashboard-tile-meta {
+      font-family: var(--ch-font-ui);
+      font-size: 11px;
+      color: var(--ch-muted);
+    }
+
+    .scaffold-caption {
+      padding: 10px 18px;
+      font-family: var(--ch-font-ui);
+      font-size: 11px;
+      color: var(--ch-muted);
+      border-top: 1px solid var(--ch-border);
+      background: color-mix(in srgb, var(--ch-bg) 90%, black 10%);
+    }
+
+    @media (max-width: 900px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        position: static;
+      }
+
+      .card-grid,
+      .color-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <aside class="panel controls">
+      <h1>Theme System</h1>
+      <p class="sub">Living preview document for Chamber-19 enforced theming. Keep editing this file as palettes evolve.</p>
+
+      <label>
+        Palette
+        <select id="paletteSelect" name="palette" aria-label="Palette"></select>
+      </label>
+
+      <label class="checkbox">
+        <input id="customToggle" name="useCustomColors" type="checkbox" aria-label="Use custom colors" />
+        Use custom colors
+      </label>
+
+      <div id="customEditor" class="color-grid" hidden></div>
+    </aside>
+
+    <section class="panel preview">
+      <div class="preview-header">
+        <div>
+          <h2>Theme Preview — Consumer UI Flows</h2>
+          <p class="sub">Runtime colors driven by palette selection and custom overrides. Mirrors how the toolkit enforces tokens in update gate, activation gate, and consumer chrome.</p>
+        </div>
+        <span id="activePalette" class="badge"></span>
+      </div>
+
+      <div class="card-grid">
+        <article class="card">
+          <h3>Update Gate</h3>
+          <p class="muted">A forced update check screen with version metadata.</p>
+          <div class="btn-row">
+            <button class="btn primary">Install and restart</button>
+            <button class="btn info">Read notes</button>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Activation Gate</h3>
+          <p class="muted">PIN activation + request actions with the same theme language.</p>
+          <div class="btn-row">
+            <button class="btn primary">Activate</button>
+            <button class="btn info">Request PIN</button>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Consumer Home</h3>
+          <p class="muted">App links, protected backend probe, and global UI chrome.</p>
+          <div class="btn-row">
+            <button class="btn success">Healthy</button>
+            <button class="btn warning">Pending</button>
+            <button class="btn error">Error</button>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>State Notice</h3>
+          <div class="notice">Activation expires in 5 days. Contact your administrator to renew your PIN.</div>
+        </article>
+      </div>
+
+      <div class="living">
+        <strong>How to keep this living:</strong><br />
+        1. Canonical palette source: <code>js/packages/desktop-toolkit/src/theme/themeSystem.js</code> (<code>TOOLKIT_PALETTES</code>). Add new palettes there first, then mirror into the <code>PALETTES</code> array in this file so the standalone preview stays in sync.<br />
+        2. Keep token names stable to avoid regressions (bg, surface, text, muted, accent, accentText, border, success, warning, error, info).<br />
+        3. Update this preview whenever toolkit theme behavior changes — consumer apps inherit it via <code>@chamber-19/desktop-toolkit/theme</code>.
+
+        <br /><br />
+        <strong>App theme override pattern.</strong> Consumer apps inherit the shell theme by default (sidebar, topbar, and workspace foundation read from <code>--ch-bg</code>, <code>--ch-surface</code>, <code>--ch-accent</code>, etc.). To give an app a distinct palette, the recommended path is to call the toolkit's theme provider with a custom palette object — that re-runs <code>applyToolkitThemeVariables()</code> and the shell's derived tokens (<code>--ch-content-bg</code>, <code>--ch-panel-bg</code>, <code>--ch-workspace-blend</code>, <code>--ch-active-bg</code>, etc.) recompute from the new palette in JS:
+        <pre style="margin: 8px 0 4px; padding: 10px; background: color-mix(in srgb, var(--ch-surface) 60%, transparent); border-radius: 6px; font-size: 11px; line-height: 1.45;">applyToolkitThemeVariables({
+  colors: {
+    bg: '#1A1C1F', surface: '#2A2D31',
+    accent: '#5C8EB8', border: '#3B4148',
+    /* ...other palette fields... */
+  }
+});</pre>
+        A CSS-only attribute pattern like <code>[data-app-theme="…"] { --ch-bg: …; }</code> will swap the raw palette tokens, but the <em>derived</em> tokens are JS-computed and won't recompute until <code>applyToolkitThemeVariables()</code> runs again. Pure-CSS swap (so attribute changes auto-recompute via <code>color-mix()</code>) is a planned future improvement; until then, prefer the JS API.
+
+        <br /><br />
+        <strong>Three-zone topbar slots.</strong> The topbar grid (<code>auto 1fr auto</code>) exposes three zones: <code>.scaffold-topbar-left</code> (page title + optional sub-title), <code>.scaffold-topbar-center</code> (app context — breadcrumbs, project picker, filters), and <code>.scaffold-topbar-right</code> (app quick-actions + app status + shell theme + shell clock). Empty app slots collapse via <code>:empty</code> and render nothing. Apps fill the slots; the shell never injects fake placeholder UI.
+
+        <br /><br />
+        <strong>Typography token contract (font-style axis is planned, not yet implemented).</strong> The shell exposes three semantic font tokens — <code>--ch-font-display</code>, <code>--ch-font-ui</code>, <code>--ch-font-mono</code> — emitted by <code>resolveEdgeMeltVariables()</code>. The preview consumes these via <code>font-family: var(--ch-font-X)</code> instead of hardcoding font names. Defaults today: <code>'Instrument Serif' / 'DM Sans' / 'JetBrains Mono'</code> with system fallbacks, matching what the shell rendered before tokenization. <em>Visual output is unchanged.</em>
+
+        <br /><br />
+        These font tokens are the contract for a future <strong>orthogonal typography axis</strong>, planned for a follow-up PR. The design intent is:
+        <pre style="margin: 8px 0 4px; padding: 10px; background: color-mix(in srgb, var(--ch-surface) 60%, transparent); border-radius: 6px; font-size: 11px; line-height: 1.45;">&lt;body data-app-theme="forge" data-font-style="lofi"&gt;</pre>
+        where <code>data-app-theme</code> controls color / surfaces / accents and <code>data-font-style</code> controls typography mood — the two axes are independent so an app can mix any palette with any typography preset. Planned font-style modes (final font choices TBD):
+        <ul style="margin: 6px 0 0 18px; padding: 0; font-size: 11px; line-height: 1.55;">
+          <li><code>default</code> — current toolkit stacks</li>
+          <li><code>technical</code> — sharper, more system-feeling (candidates: Source Serif 4 / Manrope / IBM Plex Mono)</li>
+          <li><code>lofi</code> — softer, editorial (candidates: Cormorant Garamond / Nunito Sans / IBM Plex Mono)</li>
+        </ul>
+        <strong>Status:</strong> <code>data-font-style</code> behavior is NOT implemented. No <code>[data-font-style="..."]</code> rules exist. Weight / leading / tracking tokens are not yet emitted — those will land alongside the actual font-style mode implementation. This PR establishes the family-token contract only so the future axis has clean plumbing.
+
+        <br /><br />
+        <strong>Toolkit shell CSS (out of scope this PR):</strong> <code>activation.css</code>, <code>updater.css</code>, <code>ReleaseNotes.css</code>, and <code>splash.css</code> still carry hardcoded font-family declarations (legacy Inter usage in splash/updater). Their tokenization is queued as a separate typography sweep — touching them now would broaden scope beyond what this PR was scoped to.
+      </div>
+    </section>
+
+    <section class="panel scaffold-panel">
+      <div class="scaffold-frame">
+        <aside class="scaffold-sidebar">
+          <div class="scaffold-brand">
+            <div class="scaffold-brand-orb">C</div>
+            <div class="scaffold-brand-text">
+              <span class="scaffold-brand-name">Chamber 19</span>
+              <span class="scaffold-brand-tag">Desktop Toolkit</span>
+            </div>
+          </div>
+
+          <nav class="scaffold-nav">
+            <span class="scaffold-nav-eyebrow">Workspace</span>
+            <button class="scaffold-nav-item active">Dashboard</button>
+            <button class="scaffold-nav-item">Projects</button>
+            <button class="scaffold-nav-item">Drawings</button>
+
+            <div class="scaffold-nav-divider"><span></span></div>
+
+            <span class="scaffold-nav-eyebrow">Tools</span>
+            <button class="scaffold-nav-item">Transmittals</button>
+            <button class="scaffold-nav-item">Activation</button>
+            <button class="scaffold-nav-item">Settings</button>
+          </nav>
+
+          <div class="scaffold-profile">
+            <div class="scaffold-profile-row">
+              <div class="scaffold-profile-avatar">KR</div>
+              <div class="scaffold-profile-text">
+                <span class="scaffold-profile-name">Kora Reasoner</span>
+                <span class="scaffold-profile-meta">Signed in</span>
+              </div>
+            </div>
+            <!-- Extension slot: per-app additions drop in here. Consumer
+                 apps can render any number of children without breaking
+                 the L — the bottom block grows upward, nav above re-flows
+                 in its scrollable region. Empty by default. -->
+            <div class="scaffold-profile-extension"></div>
+          </div>
+        </aside>
+
+        <div class="scaffold-workspace">
+          <header class="scaffold-topbar">
+            <!-- Zone 1 / left — page title (+ optional sub-title slot,
+                 not rendered until app provides data). -->
+            <div class="scaffold-topbar-left">
+              <h2 class="scaffold-topbar-title">Dashboard</h2>
+            </div>
+
+            <!-- Zone 2 / center — optional app context slot. Apps drop
+                 breadcrumbs, project pickers, filter bars, etc. here.
+                 Empty by default; renders no UI without app content. -->
+            <div class="scaffold-topbar-center"></div>
+
+            <!-- Zone 3 / right — app slots first (quick actions, status),
+                 then shell-owned theme + clock. App slots use
+                 .scaffold-topbar-app-actions and .scaffold-topbar-app-status;
+                 both collapse to zero width via :empty when no app
+                 content is provided. -->
+            <div class="scaffold-topbar-right">
+              <div class="scaffold-topbar-app-actions"><!-- app slot --></div>
+              <div class="scaffold-topbar-app-status"><!-- app slot --></div>
+              <button class="scaffold-topbar-pill">Theme</button>
+              <div class="scaffold-topbar-clock">
+                <span class="scaffold-clock-date" id="scaffoldDate">MAY 14, 2026</span>
+                <span class="scaffold-clock-time" id="scaffoldTime">10:24 AM</span>
+              </div>
+            </div>
+          </header>
+
+          <div class="dashboard-grid">
+            <h3 class="section-heading">Overview</h3>
+            <p class="section-paragraph">Top-level metrics for the current workspace. Each tile lifts slightly above the workspace surface and inherits its accent from the active palette.</p>
+
+            <div class="dashboard-tile">
+              <span class="dashboard-tile-label">Active Projects</span>
+              <span class="dashboard-tile-value">12</span>
+              <span class="dashboard-tile-meta">3 awaiting review</span>
+            </div>
+            <div class="dashboard-tile">
+              <span class="dashboard-tile-label">Drawings Issued</span>
+              <span class="dashboard-tile-value">248</span>
+              <span class="dashboard-tile-meta">+14 this week</span>
+            </div>
+            <div class="dashboard-tile">
+              <span class="dashboard-tile-label">Pending Transmittals</span>
+              <span class="dashboard-tile-value">5</span>
+              <span class="dashboard-tile-meta">Oldest: 2 days</span>
+            </div>
+            <div class="dashboard-tile">
+              <span class="dashboard-tile-label">Activation Status</span>
+              <span class="dashboard-tile-value" style="color: var(--ch-success);">Valid</span>
+              <span class="dashboard-tile-meta">Re-validates in 23 days</span>
+            </div>
+
+            <h3 class="section-heading">Recent Activity</h3>
+            <p class="section-paragraph">Scroll inside this workspace — the sidebar and topbar stay anchored as the content slides under them. No scrollbars are rendered, but the area is fully scrollable.</p>
+
+            <div class="dashboard-tile">
+              <span class="dashboard-tile-label">Last Sync</span>
+              <span class="dashboard-tile-value">2 min</span>
+              <span class="dashboard-tile-meta">Auto-refresh on</span>
+            </div>
+            <div class="dashboard-tile">
+              <span class="dashboard-tile-label">Disk Cache</span>
+              <span class="dashboard-tile-value">412 MB</span>
+              <span class="dashboard-tile-meta">Quota: 2 GB</span>
+            </div>
+            <div class="dashboard-tile">
+              <span class="dashboard-tile-label">Open Drawings</span>
+              <span class="dashboard-tile-value">7</span>
+              <span class="dashboard-tile-meta">Across 3 projects</span>
+            </div>
+            <div class="dashboard-tile">
+              <span class="dashboard-tile-label">Reviewer Queue</span>
+              <span class="dashboard-tile-value" style="color: var(--ch-warning);">3</span>
+              <span class="dashboard-tile-meta">Overdue: 1</span>
+            </div>
+
+            <h3 class="section-heading">System</h3>
+            <p class="section-paragraph">Per-app sections drop into this scroll region without affecting chrome layout. The profile block at the sidebar bottom is independently expandable.</p>
+
+            <div class="dashboard-tile">
+              <span class="dashboard-tile-label">Backend</span>
+              <span class="dashboard-tile-value" style="color: var(--ch-success);">Ready</span>
+              <span class="dashboard-tile-meta">Port 8000</span>
+            </div>
+            <div class="dashboard-tile">
+              <span class="dashboard-tile-label">Toolkit</span>
+              <span class="dashboard-tile-value">v2.3.2</span>
+              <span class="dashboard-tile-meta">Pin parity OK</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scaffold-caption">
+        <strong>Shell vs. content boundary.</strong> The toolkit shell owns the sidebar, topbar, workspace foundation, theme tokens, accent inheritance, and chrome→workspace blending — these are consistent across every consumer app. The content shown above (Overview / Recent Activity / System with metric cards) is the <em>Dashboard app's</em> internal layout, not a global template. Future apps — Transmittals, Drawings, Activation, Settings, project tools — fill the workspace with whatever rhythm fits: tables, queues, forms, file browsers, settings panels. The shell never forces dashboard styling. Reusable utilities (<code>.section-heading</code>, <code>.section-paragraph</code>, <code>.content-divider</code>) are opt-in.
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const PALETTES = [
+      {
+        id: 'forge',
+        name: 'Forge Classic',
+        colors: {
+          bg: '#1C1B19', surface: '#2B2926', text: '#EFEAE2', muted: '#A39A8D',
+          accent: '#C4884D', accentText: '#1C1B19', border: '#4A4238',
+          success: '#6B9E6B', warning: '#C4A24D', error: '#B85C5C', info: '#5C8EB8'
+        }
+      },
+      {
+        id: 'harbor',
+        name: 'Harbor Steel',
+        colors: {
+          bg: '#12202B', surface: '#1B3342', text: '#E9F1F5', muted: '#9AB2BF',
+          accent: '#58A8E0', accentText: '#10202A', border: '#32566B',
+          success: '#5FA88A', warning: '#C9A155', error: '#CC6E6E', info: '#7FB9E5'
+        }
+      },
+      {
+        id: 'kiln',
+        name: 'Kiln Ember',
+        colors: {
+          bg: '#271D18', surface: '#3A2A22', text: '#F4EEE8', muted: '#B7A598',
+          accent: '#E06F3C', accentText: '#2A1B14', border: '#6A493A',
+          success: '#7FB36C', warning: '#D3A14A', error: '#D86A62', info: '#73A8D9'
+        }
+      },
+      {
+        id: 'meadowline',
+        name: 'Meadowline Draft',
+        colors: {
+          bg: '#1A1E1A', surface: '#273026', text: '#ECF2E9', muted: '#A6B6A0',
+          accent: '#7DB86F', accentText: '#162016', border: '#425340',
+          success: '#6CB67A', warning: '#CFB05B', error: '#C96868', info: '#6FA4CE'
+        }
+      }
+    ];
+
+    const COLOR_KEYS = ['bg','surface','text','muted','accent','accentText','border','success','warning','error','info'];
+    const state = {
+      paletteId: PALETTES[0].id,
+      useCustomColors: false,
+      customColors: { ...PALETTES[0].colors }
+    };
+
+    const paletteSelect = document.getElementById('paletteSelect');
+    const customToggle = document.getElementById('customToggle');
+    const customEditor = document.getElementById('customEditor');
+    const activePalette = document.getElementById('activePalette');
+
+    for (const palette of PALETTES) {
+      const option = document.createElement('option');
+      option.value = palette.id;
+      option.textContent = palette.name;
+      paletteSelect.appendChild(option);
+    }
+
+    function getActivePalette() {
+      return PALETTES.find((item) => item.id === state.paletteId) || PALETTES[0];
+    }
+
+    function resolveColors() {
+      const palette = getActivePalette();
+      return state.useCustomColors
+        ? { ...palette.colors, ...state.customColors }
+        : { ...palette.colors };
+    }
+
+    // ── Edge-melt color math (mirror of themeSystem.js) ────────────────
+    // Standalone preview can't import from the toolkit module, so the
+    // algorithm is duplicated inline here. Keep in sync with the
+    // resolveEdgeMeltVariables() function in
+    // js/packages/desktop-toolkit/src/theme/themeSystem.js.
+
+    function clamp01(value) { return Math.min(1, Math.max(0, value)); }
+
+    function hexToRgb(hex) {
+      const match = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+      if (!match) throw new Error(`Edge-melt requires 6-digit hex: ${hex}`);
+      const v = match[1];
+      return {
+        r: parseInt(v.slice(0, 2), 16),
+        g: parseInt(v.slice(2, 4), 16),
+        b: parseInt(v.slice(4, 6), 16),
+      };
+    }
+
+    function rgbToHex({ r, g, b }) {
+      const ch = (n) => Math.round(Math.min(255, Math.max(0, n)))
+        .toString(16).padStart(2, '0').toUpperCase();
+      return `#${ch(r)}${ch(g)}${ch(b)}`;
+    }
+
+    function mixHex(from, to, amount) {
+      const t = clamp01(amount);
+      const a = hexToRgb(from);
+      const b = hexToRgb(to);
+      return rgbToHex({
+        r: a.r + (b.r - a.r) * t,
+        g: a.g + (b.g - a.g) * t,
+        b: a.b + (b.b - a.b) * t,
+      });
+    }
+
+    function rgbChannels(hex) {
+      const { r, g, b } = hexToRgb(hex);
+      return `${r} ${g} ${b}`;
+    }
+
+    function withAlpha(hex, alpha) {
+      return `rgb(${rgbChannels(hex)} / ${clamp01(alpha)})`;
+    }
+
+    function resolveEdgeMeltVariables(colors) {
+      // Mirror of themeSystem.js — 4-stop multi-mix gradient bridge.
+      const shellBg = colors.bg;
+      const sidebarBg = colors.bg;
+      const topbarBg = colors.bg;
+      const contentBg = mixHex(colors.bg, colors.surface, 0.12);
+      const panelBg = mixHex(colors.bg, colors.surface, 0.85);
+      const panelBorder = withAlpha(colors.accent, 0.16);
+      const borderSoft = withAlpha(colors.border, 0.42);
+      const accentMuted = withAlpha(colors.accent, 0.16);
+
+      const seamSoft = borderSoft;
+      const seamWarm = withAlpha(colors.accent, 0.14);
+      const activeFill = withAlpha(colors.border, 0.46);
+      const activeFillSoft = withAlpha(colors.border, 0.18);
+
+      return {
+        '--ch-shell-bg': shellBg,
+        '--ch-sidebar-bg': sidebarBg,
+        '--ch-topbar-bg': topbarBg,
+        '--ch-content-bg': contentBg,
+        '--ch-panel-bg': panelBg,
+        '--ch-panel-border': panelBorder,
+        '--ch-border-soft': borderSoft,
+        '--ch-accent-muted': accentMuted,
+        '--ch-font-display': "'Instrument Serif', Georgia, serif",
+        '--ch-font-ui': "'DM Sans', system-ui, sans-serif",
+        '--ch-font-mono': "'JetBrains Mono', ui-monospace, monospace",
+        '--ch-workspace-blend':
+          `linear-gradient(90deg, ` +
+          `${withAlpha(sidebarBg, 0.70)} 0px, ` +
+          `${withAlpha(sidebarBg, 0.38)} 140px, ` +
+          `${withAlpha(sidebarBg, 0.16)} 280px, ` +
+          `${withAlpha(sidebarBg, 0)} 420px), ` +
+          `linear-gradient(180deg, ` +
+          `${withAlpha(topbarBg, 0.65)} 0px, ` +
+          `${withAlpha(topbarBg, 0.32)} 120px, ` +
+          `${withAlpha(topbarBg, 0.12)} 240px, ` +
+          `${withAlpha(topbarBg, 0)} 320px)`,
+
+        '--ch-active-fill': activeFill,
+        '--ch-active-fill-soft': activeFillSoft,
+        '--ch-active-bg':
+          `linear-gradient(90deg, ${seamWarm} 0%, ${activeFill} 12%, ${activeFillSoft} 100%)`,
+
+        '--ch-content-divider':
+          `linear-gradient(90deg, transparent, ` +
+          `${withAlpha(colors.accent, 0.22)}, transparent)`,
+        '--ch-section-title-accent':
+          `linear-gradient(90deg, ` +
+          `${withAlpha(colors.accent, 0.22)}, transparent)`,
+      };
+    }
+
+    function applyColors() {
+      const colors = resolveColors();
+      for (const key of COLOR_KEYS) {
+        document.documentElement.style.setProperty(`--ch-${key}`, colors[key]);
+      }
+
+      // Edge-melt variables re-derive whenever the palette changes.
+      const edgeMelt = resolveEdgeMeltVariables(colors);
+      for (const [name, value] of Object.entries(edgeMelt)) {
+        document.documentElement.style.setProperty(name, value);
+      }
+
+      const modeText = state.useCustomColors ? 'Custom' : 'Preset';
+      activePalette.textContent = `${getActivePalette().name} (${modeText})`;
+    }
+
+    function buildCustomEditor() {
+      customEditor.innerHTML = '';
+      const colors = resolveColors();
+      for (const key of COLOR_KEYS) {
+        const labelId = `color-label-${key}`;
+        const pickerId = `color-picker-${key}`;
+        const textId = `color-hex-${key}`;
+
+        const label = document.createElement('label');
+        label.id = labelId;
+        label.textContent = key;
+
+        const row = document.createElement('div');
+        row.className = 'color-row';
+
+        const picker = document.createElement('input');
+        picker.type = 'color';
+        picker.id = pickerId;
+        picker.name = `${key}-picker`;
+        picker.setAttribute('aria-label', `${key} color picker`);
+        picker.value = colors[key];
+        picker.addEventListener('input', (event) => {
+          state.customColors[key] = event.target.value.toUpperCase();
+          applyColors();
+          buildCustomEditor();
+        });
+
+        const text = document.createElement('input');
+        text.type = 'text';
+        text.id = textId;
+        text.name = `${key}-hex`;
+        text.setAttribute('aria-label', `${key} hex value`);
+        text.setAttribute('autocomplete', 'off');
+        text.setAttribute('spellcheck', 'false');
+        text.value = colors[key];
+        text.addEventListener('change', (event) => {
+          const value = event.target.value.trim().toUpperCase();
+          if (!/^#([0-9A-F]{6})$/.test(value)) {
+            text.value = state.customColors[key];
+            return;
+          }
+          state.customColors[key] = value;
+          applyColors();
+          buildCustomEditor();
+        });
+
+        row.appendChild(picker);
+        row.appendChild(text);
+        label.appendChild(row);
+        customEditor.appendChild(label);
+      }
+    }
+
+    paletteSelect.addEventListener('change', (event) => {
+      state.paletteId = event.target.value;
+      const nextBase = getActivePalette().colors;
+      state.customColors = state.useCustomColors
+        ? { ...nextBase, ...state.customColors }
+        : { ...nextBase };
+      applyColors();
+      buildCustomEditor();
+    });
+
+    customToggle.addEventListener('change', (event) => {
+      state.useCustomColors = event.target.checked;
+      customEditor.hidden = !state.useCustomColors;
+      applyColors();
+      buildCustomEditor();
+    });
+
+    paletteSelect.value = state.paletteId;
+    customToggle.checked = state.useCustomColors;
+    customEditor.hidden = !state.useCustomColors;
+    applyColors();
+    buildCustomEditor();
+
+    // ── Live clock for the Sidebar/TopBar scaffold ──────────────────────
+    const scaffoldDate = document.getElementById('scaffoldDate');
+    const scaffoldTime = document.getElementById('scaffoldTime');
+
+    function updateScaffoldClock() {
+      const now = new Date();
+      scaffoldDate.textContent = now
+        .toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+        .toUpperCase();
+      scaffoldTime.textContent = now.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+      });
+    }
+
+    updateScaffoldClock();
+    setInterval(updateScaffoldClock, 1000);
+  </script>
+</body>
+</html>
