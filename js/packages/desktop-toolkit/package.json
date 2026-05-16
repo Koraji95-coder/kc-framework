@@ -39,7 +39,7 @@
   "devDependencies": {
     "@chamber-19/stylelint-config": "*",
     "stylelint": "^16.10.0",
-    "stylelint-config-standard": "^36.0.1"
+    "stylelint-config-standard": "^40.0.0"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
