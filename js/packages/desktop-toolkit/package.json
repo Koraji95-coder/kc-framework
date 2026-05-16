@@ -12,6 +12,7 @@
     "./activation/hook": "./src/activation/useActivation.js",
     "./components/UpdateModal": "./src/components/UpdateModal/UpdateModal.jsx",
     "./components/ReleaseNotes": "./src/components/ReleaseNotes/ReleaseNotes.jsx",
+    "./theme": "./src/theme/index.js",
     "./utils/version": "./src/utils/version.js",
     "./window/showOnReady": "./src/window/showOnReady.jsx"
   },

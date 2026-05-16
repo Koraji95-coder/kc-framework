@@ -8,6 +8,16 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Added
 
+- Shared JS theme system for consumer apps in `js/packages/desktop-toolkit/src/theme/`:
+  - `@chamber-19/desktop-toolkit/theme` export with preset palette registry, theme state load/save helpers, CSS variable application, and palette-to-theme resolution helpers
+  - `ToolkitThemeControls` component for palette selection + custom color overrides
+  - `ToolkitThemeProvider` and `useToolkitThemeState` hook for app-level theme orchestration
+  - Standalone living preview document at `docs/theme-system-preview.html` for palette iteration — mirrors `TOOLKIT_PALETTES` in self-contained HTML/JS, demonstrates the canonical L-shape app shell with sidebar + topbar + sticky-chrome scaffold and a bottom-pinned profile slot
+  - **Edge-melt engine promoted into the theme module** (completes the three-stage merge plan originally documented in the standalone `ch19-ui-transition-engine/`):
+    - New `resolveEdgeMeltVariables(colors, options)` function in `themeSystem.js` derives the bridge gradient, topbar inner-glow stroke, triple-junction corner anchor, and active sidebar-item bleed algorithmically from the resolved palette. Output is a set of `--ch-bridge-*`, `--ch-topbar-inner-glow`, `--ch-corner-anchor`, `--ch-active-*`, `--ch-active-bleed`, and `--ch-edge-width` CSS variables.
+    - `applyToolkitThemeVariables()` now applies these edge-melt variables alongside the base palette so consumer apps inherit the soft chrome/surface transitions for free. Palette swaps re-derive the gradients automatically.
+    - Token namespace unified — promotion drops the engine's parallel `--ch19-*` prefix in favor of the toolkit's canonical `--ch-*` contract. No separate provider, no separate API surface.
+    - Scaffold preview wired to use the new edge-melt variables: 2px bridge between sidebar and workspace, radial corner anchor at the triple-junction, accent-tinted inner-glow on the topbar, active-item bleed extending past the sidebar's right edge into the workspace.
 - **`@chamber-19/stylelint-config`** — new shared stylelint config package at
   `js/packages/stylelint-config-chamber19/`. Enforces the CSS_DISCIPLINE.md
   rules across consumer apps and the toolkit itself. Every error message
@@ -43,6 +53,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
     - `GET /admin/audit-log` — view audit trail (admin)
 
 ### Changed
+
+- Activation gate, updater progress window, and update modal styles now read shared CSS theme tokens (`--ch-*`) with fallbacks so consuming apps can override enforced one-color styling safely.
 
 - `launcher` now depends on activation service for PIN/hardware/token logic
 - Consumer apps (`transmittal-builder`, etc.) no longer embed activation; they
