@@ -74,8 +74,6 @@ src/components/Foo.css:42:5
   _theme.override.css. See chamber-19/.github → docs/skills/CSS_DISCIPLINE.md.
 ```
 
-In CI, the same message is emitted as a GitHub Actions `::error` annotation so it appears inline on the PR's Files Changed tab.
-
 ## CI integration
 
 Run stylelint in the same job that runs Biome and your tests. Example GitHub Actions step:
