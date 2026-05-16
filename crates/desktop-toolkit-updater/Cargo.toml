@@ -5,7 +5,7 @@ description = "desktop-toolkit updater shim — separate process that handles si
 authors = ["Koraji"]
 license = "MIT"
 edition = "2021"
-rust-version = "1.77.2"
+rust-version = "1.85.0"
 repository = "https://github.com/chamber-19/desktop-toolkit"
 publish = false
 

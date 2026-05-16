@@ -5,7 +5,7 @@ description = "Shared Tauri framework crate for chamber-19 desktop tools"
 authors = ["Koraji"]
 license = "MIT"
 edition = "2021"
-rust-version = "1.77.2"
+rust-version = "1.85.0"
 repository = "https://github.com/chamber-19/desktop-toolkit"
 keywords = ["tauri", "desktop", "framework", "updater", "splash"]
 categories = ["gui"]
@@ -15,7 +15,7 @@ tauri = { version = "2", features = [] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 semver = "1"
-digest = "0.10"
+digest = "0.11"
 hmac = "0.13"
 sha2 = "0.11"
 base64 = "0.22"
