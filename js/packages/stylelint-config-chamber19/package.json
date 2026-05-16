@@ -10,7 +10,7 @@
     "README.md"
   ],
   "peerDependencies": {
-    "stylelint": ">=16.0.0"
+    "stylelint": "^17.11.1"
   },
   "dependencies": {
     "stylelint-config-standard": "^40.0.0"
