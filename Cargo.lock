@@ -584,6 +584,7 @@ name = "desktop-toolkit"
 version = "2.3.2"
 dependencies = [
  "base64 0.22.1",
+ "digest",
  "hmac",
  "reqwest",
  "semver",
