@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo Chamber-19 discipline reminder: before editing this file, read whichever of these org skills apply -- ..\\.github\\docs\\skills\\CSS_DISCIPLINE.md (any .css/.scss), ..\\.github\\docs\\skills\\UI_UX_DISCIPLINE.md (any .jsx/.tsx/.css/.scss), ..\\.github\\docs\\skills\\RUST.MD (any .rs), ..\\.github\\docs\\skills\\TAURI.MD (anything under src-tauri/), ..\\.github\\docs\\skills\\MARKDOWN.md (any .md/.mdx). Apply their MUST/NEVER rules to your edit. Source-of-truth is chamber-19/.github @ main."
+          }
+        ]
+      }
+    ]
+  }
+}
