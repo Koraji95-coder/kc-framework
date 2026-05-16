@@ -34,6 +34,73 @@
       --ch-info: #5C8EB8;
     }
 
+    /* ── Derived tokens (per-element re-derivation) ────────────────────
+       CSS spec: var() inside a custom property value is substituted at
+       the DECLARING element's computed-value time, not at the using
+       element. So if we declared derived tokens only on :root (or only
+       via JS-emitted inline style on documentElement), a descendant
+       [data-app-theme="X"] override of palette tokens would NOT affect
+       derived tokens — the descendant inherits the COMPUTED (already-
+       substituted) derived value from :root.
+
+       Re-declaring derived tokens on every [data-app-theme] element
+       solves this: each override scope gets its own local declaration,
+       so var(--ch-bg), var(--ch-accent), etc. re-substitute at that
+       element using the overridden palette values, and the new derived
+       tokens cascade through the override's subtree.
+
+       The :root case mirrors what applyToolkitThemeVariables emits as
+       inline style on documentElement — same expressions, same result.
+       Apps that don't use the JS API still get correct derived tokens
+       on the default theme via this :root rule. Apps that override via
+       [data-app-theme] get them re-derived locally. Apps using the JS
+       picker get them inline on documentElement. All three paths agree. */
+    :root,
+    [data-app-theme] {
+      --ch-shell-bg: var(--ch-bg);
+      --ch-sidebar-bg: var(--ch-bg);
+      --ch-topbar-bg: var(--ch-bg);
+      --ch-content-bg: color-mix(in srgb, var(--ch-bg) 88%, var(--ch-surface));
+      --ch-panel-bg: color-mix(in srgb, var(--ch-bg) 15%, var(--ch-surface));
+      --ch-panel-border: rgb(from var(--ch-accent) r g b / 0.16);
+      --ch-border-soft: rgb(from var(--ch-border) r g b / 0.42);
+      --ch-accent-muted: rgb(from var(--ch-accent) r g b / 0.16);
+      --ch-active-fill: rgb(from var(--ch-border) r g b / 0.46);
+      --ch-active-fill-soft: rgb(from var(--ch-border) r g b / 0.18);
+      --ch-active-bg: linear-gradient(
+        90deg,
+        rgb(from var(--ch-accent) r g b / 0.14) 0%,
+        rgb(from var(--ch-border) r g b / 0.46) 12%,
+        rgb(from var(--ch-border) r g b / 0.18) 100%
+      );
+      --ch-workspace-blend:
+        linear-gradient(
+          90deg,
+          rgb(from var(--ch-bg) r g b / 0.70) 0px,
+          rgb(from var(--ch-bg) r g b / 0.38) 140px,
+          rgb(from var(--ch-bg) r g b / 0.16) 280px,
+          rgb(from var(--ch-bg) r g b / 0) 420px
+        ),
+        linear-gradient(
+          180deg,
+          rgb(from var(--ch-bg) r g b / 0.65) 0px,
+          rgb(from var(--ch-bg) r g b / 0.32) 120px,
+          rgb(from var(--ch-bg) r g b / 0.12) 240px,
+          rgb(from var(--ch-bg) r g b / 0) 320px
+        );
+      --ch-content-divider: linear-gradient(
+        90deg,
+        transparent,
+        rgb(from var(--ch-accent) r g b / 0.22),
+        transparent
+      );
+      --ch-section-title-accent: linear-gradient(
+        90deg,
+        rgb(from var(--ch-accent) r g b / 0.22),
+        transparent
+      );
+    }
+
     * { box-sizing: border-box; }
 
     body {
@@ -901,15 +968,14 @@
         3. Update this preview whenever toolkit theme behavior changes — consumer apps inherit it via <code>@chamber-19/desktop-toolkit/theme</code>.
 
         <br /><br />
-        <strong>App theme override pattern.</strong> Consumer apps inherit the shell theme by default (sidebar, topbar, and workspace foundation read from <code>--ch-bg</code>, <code>--ch-surface</code>, <code>--ch-accent</code>, etc.). To give an app a distinct palette, the recommended path is to call the toolkit's theme provider with a custom palette object — that re-runs <code>applyToolkitThemeVariables()</code> and the shell's derived tokens (<code>--ch-content-bg</code>, <code>--ch-panel-bg</code>, <code>--ch-workspace-blend</code>, <code>--ch-active-bg</code>, etc.) recompute from the new palette in JS:
-        <pre style="margin: 8px 0 4px; padding: 10px; background: color-mix(in srgb, var(--ch-surface) 60%, transparent); border-radius: 6px; font-size: 11px; line-height: 1.45;">applyToolkitThemeVariables({
-  colors: {
-    bg: '#1A1C1F', surface: '#2A2D31',
-    accent: '#5C8EB8', border: '#3B4148',
-    /* ...other palette fields... */
-  }
-});</pre>
-        A CSS-only attribute pattern like <code>[data-app-theme="…"] { --ch-bg: …; }</code> will swap the raw palette tokens, but the <em>derived</em> tokens are JS-computed and won't recompute until <code>applyToolkitThemeVariables()</code> runs again. Pure-CSS swap (so attribute changes auto-recompute via <code>color-mix()</code>) is a planned future improvement; until then, prefer the JS API.
+        <strong>App theme override pattern (CSS-only swap supported).</strong> Consumer apps inherit the shell theme by default (sidebar, topbar, and workspace foundation read from <code>--ch-bg</code>, <code>--ch-surface</code>, <code>--ch-accent</code>, etc.). To give an app a distinct palette, override the four palette tokens under a scoped attribute:
+        <pre style="margin: 8px 0 4px; padding: 10px; background: color-mix(in srgb, var(--ch-surface) 60%, transparent); border-radius: 6px; font-size: 11px; line-height: 1.45;">[data-app-theme="transmittals"] {
+  --ch-bg: #1A1C1F;       /* sidebar + topbar chrome */
+  --ch-surface: #2A2D31;  /* drives content-bg + panel-bg */
+  --ch-accent: #5C8EB8;
+  --ch-border: #3B4148;
+}</pre>
+        All <em>derived</em> tokens (<code>--ch-content-bg</code>, <code>--ch-panel-bg</code>, <code>--ch-workspace-blend</code>, <code>--ch-active-bg</code>, <code>--ch-panel-border</code>, etc.) are emitted as CSS expressions — <code>color-mix(in srgb, var(--ch-bg) 88%, var(--ch-surface))</code> for solid blends and <code>rgb(from var(--ch-accent) r g b / 0.16)</code> for alpha overlays — so they recompute automatically when the palette tokens change. No JS hook needed. The toolkit's <code>applyToolkitThemeVariables()</code> JS API is still available for programmatic palette swaps (e.g. user choosing a palette from a picker), but a pure CSS attribute toggle is now sufficient for static app theming.
 
         <br /><br />
         <strong>Three-zone topbar slots.</strong> The topbar grid (<code>auto 1fr auto</code>) exposes three zones: <code>.scaffold-topbar-left</code> (page title + optional sub-title), <code>.scaffold-topbar-center</code> (app context — breadcrumbs, project picker, filters), and <code>.scaffold-topbar-right</code> (app quick-actions + app status + shell theme + shell clock). Empty app slots collapse via <code>:empty</code> and render nothing. Apps fill the slots; the shell never injects fake placeholder UI.
@@ -1190,45 +1256,37 @@
       return `rgb(${rgbChannels(hex)} / ${clamp01(alpha)})`;
     }
 
-    function resolveEdgeMeltVariables(colors) {
-      // Mirror of themeSystem.js — 4-stop multi-mix gradient bridge.
-      const shellBg = colors.bg;
-      const sidebarBg = colors.bg;
-      const topbarBg = colors.bg;
-      const contentBg = mixHex(colors.bg, colors.surface, 0.12);
-      const panelBg = mixHex(colors.bg, colors.surface, 0.85);
-      const panelBorder = withAlpha(colors.accent, 0.16);
-      const borderSoft = withAlpha(colors.border, 0.42);
-      const accentMuted = withAlpha(colors.accent, 0.16);
-
-      const seamSoft = borderSoft;
-      const seamWarm = withAlpha(colors.accent, 0.14);
-      const activeFill = withAlpha(colors.border, 0.46);
-      const activeFillSoft = withAlpha(colors.border, 0.18);
+    function resolveEdgeMeltVariables(/* colors reserved */) {
+      // Mirror of themeSystem.js — derived tokens are CSS expressions
+      // (color-mix + relative color syntax) that reference palette
+      // tokens. CSS-only [data-app-theme] overrides auto-propagate.
+      const seamWarm = `rgb(from var(--ch-accent) r g b / 0.14)`;
+      const activeFill = `rgb(from var(--ch-border) r g b / 0.46)`;
+      const activeFillSoft = `rgb(from var(--ch-border) r g b / 0.18)`;
 
       return {
-        '--ch-shell-bg': shellBg,
-        '--ch-sidebar-bg': sidebarBg,
-        '--ch-topbar-bg': topbarBg,
-        '--ch-content-bg': contentBg,
-        '--ch-panel-bg': panelBg,
-        '--ch-panel-border': panelBorder,
-        '--ch-border-soft': borderSoft,
-        '--ch-accent-muted': accentMuted,
+        '--ch-shell-bg': `var(--ch-bg)`,
+        '--ch-sidebar-bg': `var(--ch-bg)`,
+        '--ch-topbar-bg': `var(--ch-bg)`,
+        '--ch-content-bg': `color-mix(in srgb, var(--ch-bg) 88%, var(--ch-surface))`,
+        '--ch-panel-bg': `color-mix(in srgb, var(--ch-bg) 15%, var(--ch-surface))`,
+        '--ch-panel-border': `rgb(from var(--ch-accent) r g b / 0.16)`,
+        '--ch-border-soft': `rgb(from var(--ch-border) r g b / 0.42)`,
+        '--ch-accent-muted': `rgb(from var(--ch-accent) r g b / 0.16)`,
         '--ch-font-display': "'Instrument Serif', Georgia, serif",
         '--ch-font-ui': "'DM Sans', system-ui, sans-serif",
         '--ch-font-mono': "'JetBrains Mono', ui-monospace, monospace",
         '--ch-workspace-blend':
           `linear-gradient(90deg, ` +
-          `${withAlpha(sidebarBg, 0.70)} 0px, ` +
-          `${withAlpha(sidebarBg, 0.38)} 140px, ` +
-          `${withAlpha(sidebarBg, 0.16)} 280px, ` +
-          `${withAlpha(sidebarBg, 0)} 420px), ` +
+          `rgb(from var(--ch-bg) r g b / 0.70) 0px, ` +
+          `rgb(from var(--ch-bg) r g b / 0.38) 140px, ` +
+          `rgb(from var(--ch-bg) r g b / 0.16) 280px, ` +
+          `rgb(from var(--ch-bg) r g b / 0) 420px), ` +
           `linear-gradient(180deg, ` +
-          `${withAlpha(topbarBg, 0.65)} 0px, ` +
-          `${withAlpha(topbarBg, 0.32)} 120px, ` +
-          `${withAlpha(topbarBg, 0.12)} 240px, ` +
-          `${withAlpha(topbarBg, 0)} 320px)`,
+          `rgb(from var(--ch-bg) r g b / 0.65) 0px, ` +
+          `rgb(from var(--ch-bg) r g b / 0.32) 120px, ` +
+          `rgb(from var(--ch-bg) r g b / 0.12) 240px, ` +
+          `rgb(from var(--ch-bg) r g b / 0) 320px)`,
 
         '--ch-active-fill': activeFill,
         '--ch-active-fill-soft': activeFillSoft,
@@ -1237,10 +1295,10 @@
 
         '--ch-content-divider':
           `linear-gradient(90deg, transparent, ` +
-          `${withAlpha(colors.accent, 0.22)}, transparent)`,
+          `rgb(from var(--ch-accent) r g b / 0.22), transparent)`,
         '--ch-section-title-accent':
           `linear-gradient(90deg, ` +
-          `${withAlpha(colors.accent, 0.22)}, transparent)`,
+          `rgb(from var(--ch-accent) r g b / 0.22), transparent)`,
       };
     }
 

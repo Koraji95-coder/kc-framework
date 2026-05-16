@@ -235,100 +235,106 @@ function withAlpha(hex, alpha) {
   return `rgb(${rgbChannels(hex)} / ${clamp01(alpha)})`;
 }
 
-export function resolveEdgeMeltVariables(colors /* options reserved */) {
-  // Continuous-surface model. The app reads as one warm material with
-  // raised panels on top, not as a sidebar+workspace rectangle split.
-  // Shell, sidebar, topbar share the darkest level; content-bg sits
-  // just barely above shell; panels lift to surface-level. The chrome→
-  // workspace transition is handled by a single mechanism: the workspace
-  // blend (two 4-stop linear fades on workspace background). No bridge
-  // seams, no corner anchor, no accent radials.
+export function resolveEdgeMeltVariables(_colors /* reserved */, _options = {}) {
+  // Derived token values are now CSS EXPRESSIONS that reference the
+  // palette CSS variables (--ch-bg, --ch-accent, etc.) rather than
+  // pre-computed hex strings. This means [data-app-theme="X"] selectors
+  // overriding palette tokens auto-propagate through all derived tokens
+  // (content-bg, panel-bg, workspace-blend, active-bg, etc.) without
+  // needing to re-run applyToolkitThemeVariables. CSS does the math at
+  // paint time.
+  //
+  // Mixing strategy:
+  //   - Solid color blends:  color-mix(in srgb, var(--ch-X) N%, var(--ch-Y))
+  //   - Alpha overlays:      rgb(from var(--ch-X) r g b / α)
+  //
+  // The alpha overlays use relative color syntax (Chromium 119+ / Firefox
+  // 113+ / Safari 16.4+) to preserve the source RGB while varying alpha.
+  // color-mix(... transparent) would darken through interpolation because
+  // it scales both RGB and alpha; relative color syntax does not.
+  //
+  // The `colors` argument is accepted for backward compat with callers
+  // that pass a palette object, but is unused for derived token values.
+  // applyToolkitThemeVariables sets the palette tokens (--ch-bg, etc.)
+  // from the palette object in JS; this function emits CSS expressions
+  // that reference those tokens.
 
   // ── Semantic surface hierarchy ────────────────────────────────────
-  // These are the tokens consumer apps should consume. The raw palette
-  // tokens (--ch-bg, --ch-surface) remain available but consumer pages
-  // should prefer these semantic ones for forward-compatibility.
-  const shellBg = colors.bg;
-  const sidebarBg = colors.bg;
-  const topbarBg = colors.bg;
+  // Consumer apps reference these semantic tokens rather than the raw
+  // palette. Apps overriding via [data-app-theme] only need to set the
+  // palette tokens (--ch-bg, --ch-surface, --ch-accent, --ch-border);
+  // semantic tokens recompute automatically.
+  const shellBg = `var(--ch-bg)`;
+  const sidebarBg = `var(--ch-bg)`;
+  const topbarBg = `var(--ch-bg)`;
   // Content is ~12% of the way from bg to surface — connected to shell,
-  // not dramatically lighter. Workspace reads as a continuation of the
-  // chrome rather than a separate rectangle.
-  const contentBg = mixHex(colors.bg, colors.surface, 0.12);
-  // Panels lift toward surface (~85% mix), giving cards/widgets clear
-  // elevation against the content background.
-  const panelBg = mixHex(colors.bg, colors.surface, 0.85);
-  const panelBorder = withAlpha(colors.accent, 0.16);
-  const borderSoft = withAlpha(colors.border, 0.42);
-  const accentMuted = withAlpha(colors.accent, 0.16);
+  // not dramatically lighter.
+  const contentBg = `color-mix(in srgb, var(--ch-bg) 88%, var(--ch-surface))`;
+  // Panels lift toward surface (~85% mix).
+  const panelBg = `color-mix(in srgb, var(--ch-bg) 15%, var(--ch-surface))`;
+  const panelBorder = `rgb(from var(--ch-accent) r g b / 0.16)`;
+  const borderSoft = `rgb(from var(--ch-border) r g b / 0.42)`;
+  const accentMuted = `rgb(from var(--ch-accent) r g b / 0.16)`;
 
   // ── Semantic typography tokens ────────────────────────────────────
   // Three semantic font roles. Match the shell's current fonts exactly
   // — no visual change. These exist as tokens so a future independent
   // typography axis (planned: `[data-font-style="default|technical|lofi"]`)
   // can override font choice per mood without touching the color palette.
-  // See preview's "How to keep this living" section for the planned axis.
   const fontDisplay = "'Instrument Serif', Georgia, serif";
   const fontUi = "'DM Sans', system-ui, sans-serif";
   const fontMono = "'JetBrains Mono', ui-monospace, monospace";
 
   // ── Seam / active tokens ──────────────────────────────────────────
-  const seamSoft = borderSoft;
-  const seamWarm = withAlpha(colors.accent, 0.14);
-  const activeFill = withAlpha(colors.border, 0.46);
-  const activeFillSoft = withAlpha(colors.border, 0.18);
+  const seamWarm = `rgb(from var(--ch-accent) r g b / 0.14)`;
+  const activeFill = `rgb(from var(--ch-border) r g b / 0.46)`;
+  const activeFillSoft = `rgb(from var(--ch-border) r g b / 0.18)`;
 
-  // Active item background: structured 3-stop gradient. Warm accent
-  // wash on the left, border-fill in the body, lighter border-fill on
-  // the right edge. Stays a defined rounded rectangle.
+  // Active item background: 3-stop gradient using relative-color alpha
+  // overlays. RGB stays at accent / border throughout — no darkening
+  // toward black.
   const activeBgCss =
     `linear-gradient(90deg, ${seamWarm} 0%, ` +
     `${activeFill} 12%, ${activeFillSoft} 100%)`;
 
   // ── Divider variants ──────────────────────────────────────────────
   // Content divider: soft full-width accent line. Optional visual pause
-  // for workspace content; should never dominate. Consumer pages opt
-  // in by applying .ch-content-divider — never forced globally.
+  // for workspace content. Relative-color syntax preserves accent RGB
+  // so fades don't darken through black.
   const contentDividerCss =
     `linear-gradient(90deg, transparent, ` +
-    `${withAlpha(colors.accent, 0.22)}, transparent)`;
+    `rgb(from var(--ch-accent) r g b / 0.22), transparent)`;
 
   // Section title accent: short trailing accent line beside a heading.
-  // Used as the PRIMARY rhythm for content sections (via section
-  // heading ::after), with hard dividers reserved for occasional use.
   const sectionTitleAccentCss =
     `linear-gradient(90deg, ` +
-    `${withAlpha(colors.accent, 0.22)}, transparent)`;
+    `rgb(from var(--ch-accent) r g b / 0.22), transparent)`;
 
   // ── Workspace corner blend ────────────────────────────────────────
   // Two 4-stop linear gradients painted on the workspace background.
+  // Each stop uses relative-color syntax so the RGB tracks the live
+  // value of var(--ch-bg) — when an app overrides --ch-bg via
+  // [data-app-theme="X"], the entire blend re-derives in CSS without
+  // any JS hook.
+  //
   // Stop alphas mirror a color-mix mental model — at x=0 the workspace
-  // is effectively 70% sidebar-bg / 30% content-bg (seam nearly
-  // invisible), gradually transitioning to 100% content-bg over 420px.
-  // Topbar mirrors with its own 4-stop fade over 320px.
+  // is ~70% chrome-bg over content (seam nearly invisible), gradually
+  // transitioning to 0% chrome over 420px. Topbar mirrors over 320px.
   //
-  // Both gradients stay at chrome RGB throughout, varying alpha only.
-  // Final stop is chrome-at-zero-alpha (NOT the "transparent" keyword,
-  // which resolves to rgba(0,0,0,0) and would darken interpolation
-  // toward black). With content-bg as the underlying background-color,
-  // both gradients composite cleanly — each contributes chrome warmth
-  // at its respective edge, and they overlap at the L-corner without
-  // creating a hot spot.
-  //
-  // Apps with different sidebarBg / topbarBg / contentBg automatically
-  // get a clean blend bridge — change any palette token and the gradient
-  // re-derives. No assumption that sidebar and topbar share a color.
+  // Endpoints use alpha 0 (NOT the `transparent` keyword) so the RGB
+  // stays at chrome throughout the gradient — no darkening toward black
+  // at the fade-out edge.
   const workspaceBlendCss =
     `linear-gradient(90deg, ` +
-    `${withAlpha(sidebarBg, 0.70)} 0px, ` +
-    `${withAlpha(sidebarBg, 0.38)} 140px, ` +
-    `${withAlpha(sidebarBg, 0.16)} 280px, ` +
-    `${withAlpha(sidebarBg, 0)} 420px), ` +
+    `rgb(from var(--ch-bg) r g b / 0.70) 0px, ` +
+    `rgb(from var(--ch-bg) r g b / 0.38) 140px, ` +
+    `rgb(from var(--ch-bg) r g b / 0.16) 280px, ` +
+    `rgb(from var(--ch-bg) r g b / 0) 420px), ` +
     `linear-gradient(180deg, ` +
-    `${withAlpha(topbarBg, 0.65)} 0px, ` +
-    `${withAlpha(topbarBg, 0.32)} 120px, ` +
-    `${withAlpha(topbarBg, 0.12)} 240px, ` +
-    `${withAlpha(topbarBg, 0)} 320px)`;
+    `rgb(from var(--ch-bg) r g b / 0.65) 0px, ` +
+    `rgb(from var(--ch-bg) r g b / 0.32) 120px, ` +
+    `rgb(from var(--ch-bg) r g b / 0.12) 240px, ` +
+    `rgb(from var(--ch-bg) r g b / 0) 320px)`;
 
   return {
     // ── Semantic surface hierarchy ─────────────────────────────────
