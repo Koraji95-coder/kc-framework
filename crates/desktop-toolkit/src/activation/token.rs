@@ -10,7 +10,7 @@
 // used so that dev tokens cannot be used in production.
 
 use base64::{engine::general_purpose::STANDARD, Engine};
-use hmac::{Hmac, Mac};
+use hmac::{Hmac, KeyInit, Mac};
 use sha2::{Digest, Sha256};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
