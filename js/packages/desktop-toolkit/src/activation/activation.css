@@ -10,8 +10,8 @@
 .activation-root {
   position: fixed;
   inset: 0;
-  background: #1C1B19;
-  color: #f0ede8;
+  background: var(--ch-bg, #1C1B19);
+  color: var(--ch-text, #f0ede8);
   font-family: 'DM Sans', system-ui, sans-serif;
   display: flex;
   flex-direction: column;
@@ -53,7 +53,7 @@
 /* ── Card ────────────────────────────────────────────────────────────────── */
 .activation-card {
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(196, 136, 77, 0.18);
+  border: 1px solid var(--ch-border, #4A4238);
   border-radius: 8px;
   padding: 28px 32px;
   width: 100%;
@@ -68,14 +68,14 @@
   font-family: 'Instrument Serif', Georgia, serif;
   font-size: 20px;
   font-weight: 400;
-  color: #f0ede8;
+  color: var(--ch-text, #f0ede8);
   letter-spacing: 0.01em;
 }
 
 .activation-subtext {
   font-size: 12px;
   line-height: 1.55;
-  color: rgba(240, 237, 232, 0.55);
+  color: var(--ch-muted, rgba(240, 237, 232, 0.55));
   margin-top: -12px;
 }
 
@@ -90,17 +90,17 @@
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 10px;
   letter-spacing: 0.08em;
-  color: rgba(196, 136, 77, 0.8);
+  color: var(--ch-accent, #C4884D);
   text-transform: uppercase;
 }
 
 .activation-input {
   width: 100%;
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--ch-border, rgba(255, 255, 255, 0.1));
   border-radius: 4px;
   padding: 9px 12px;
-  color: #f0ede8;
+  color: var(--ch-text, #f0ede8);
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 15px;
   letter-spacing: 0.12em;
@@ -109,7 +109,7 @@
 }
 
 .activation-input:focus {
-  border-color: rgba(196, 136, 77, 0.55);
+  border-color: var(--ch-accent, #C4884D);
 }
 
 .activation-input::placeholder {
@@ -121,10 +121,10 @@
 .activation-btn {
   width: 100%;
   padding: 10px 16px;
-  background: #C4884D;
+  background: var(--ch-accent, #C4884D);
   border: none;
   border-radius: 4px;
-  color: #1C1B19;
+  color: var(--ch-accentText, #1C1B19);
   font-family: 'DM Sans', system-ui, sans-serif;
   font-size: 13px;
   font-weight: 600;
@@ -134,7 +134,7 @@
 }
 
 .activation-btn:hover:not(:disabled) {
-  background: #d4986d;
+  background: var(--ch-info, #d4986d);
 }
 
 .activation-btn:disabled {
@@ -146,22 +146,22 @@
 .activation-error {
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 11px;
-  color: #B85C5C;
+  color: var(--ch-error, #B85C5C);
   line-height: 1.45;
   padding: 8px 10px;
   background: rgba(184, 92, 92, 0.08);
-  border: 1px solid rgba(184, 92, 92, 0.25);
+  border: 1px solid var(--ch-error, rgba(184, 92, 92, 0.25));
   border-radius: 4px;
 }
 
 /* ── Warning banner (near expiry) ───────────────────────────────────────── */
 .activation-warning-banner {
   font-size: 12px;
-  color: #C4A24D;
+  color: var(--ch-warning, #C4A24D);
   line-height: 1.5;
   padding: 8px 10px;
   background: rgba(196, 162, 77, 0.08);
-  border: 1px solid rgba(196, 162, 77, 0.25);
+  border: 1px solid var(--ch-warning, rgba(196, 162, 77, 0.25));
   border-radius: 4px;
   display: flex;
   gap: 8px;
@@ -174,7 +174,7 @@
   width: 14px;
   height: 14px;
   border: 2px solid rgba(196, 136, 77, 0.25);
-  border-top-color: #C4884D;
+  border-top-color: var(--ch-accent, #C4884D);
   border-radius: 50%;
   animation: activation-spin 0.75s linear infinite;
   flex-shrink: 0;
@@ -187,5 +187,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .activation-spinner { animation: none; border-top-color: #C4884D; }
+  .activation-spinner { animation: none; border-top-color: var(--ch-accent, #C4884D); }
 }

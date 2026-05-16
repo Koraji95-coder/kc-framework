@@ -12,13 +12,13 @@
 }
 
 .update-modal {
-  background: #1a1410;
-  border: 1px solid #4a3a28;
+  background: var(--ch-bg, #1a1410);
+  border: 1px solid var(--ch-border, #4a3a28);
   border-radius: 8px;
   padding: 2rem;
   width: min(420px, 90vw);
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
-  color: #e8d5b8;
+  color: var(--ch-text, #e8d5b8);
 }
 
 /* ── Header ─────────────────────────────────────────────────────────── */
@@ -34,13 +34,13 @@
   width: 40px;
   height: 40px;
   flex-shrink: 0;
-  color: #c4914a;
+  color: var(--ch-accent, #c4914a);
 }
 
 .update-modal-title {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #f0dcc0;
+  color: var(--ch-text, #f0dcc0);
   margin: 0;
   letter-spacing: 0.01em;
 }
@@ -53,7 +53,7 @@
 
 .update-modal-version {
   font-size: 0.95rem;
-  color: #c4914a;
+  color: var(--ch-accent, #c4914a);
   margin: 0 0 0.5rem;
 }
 
@@ -69,7 +69,7 @@
 
 .update-modal-message {
   font-size: 0.875rem;
-  color: #a89070;
+  color: var(--ch-muted, #a89070);
   margin: 0;
 }
 
@@ -81,8 +81,8 @@
 }
 
 .update-modal-btn {
-  background: #c4914a;
-  color: #1a1410;
+  background: var(--ch-accent, #c4914a);
+  color: var(--ch-accentText, #1a1410);
   border: none;
   border-radius: 4px;
   padding: 0.625rem 1.5rem;
@@ -94,14 +94,14 @@
 }
 
 .update-modal-btn:hover {
-  background: #d9a45a;
+  background: var(--ch-info, #d9a45a);
 }
 
 .update-modal-btn:active {
-  background: #b07a3a;
+  background: var(--ch-warning, #b07a3a);
 }
 
 .update-modal-btn:focus-visible {
-  outline: 2px solid #c4914a;
+  outline: 2px solid var(--ch-accent, #c4914a);
   outline-offset: 2px;
 }
