@@ -54,7 +54,6 @@ jobs:
           node-version: "20"
       - name: Install JS package deps
         run: |
-          cd js/packages/desktop-toolkit
           npm install --no-save react react-dom @tauri-apps/api marked dompurify
       - name: Validate exports map (every declared subpath must exist)
         run: |
