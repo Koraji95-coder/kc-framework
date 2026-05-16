@@ -6,6 +6,25 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Fixed
+
+- **Rust `digest` version inconsistency**: `digest = "0.10"` was pinned in
+  `crates/desktop-toolkit/Cargo.toml` while `hmac = "0.13"` and `sha2 = "0.11"`
+  both require `digest 0.11`. Updated to `digest = "0.11"` so all three
+  crypto dependencies resolve against the same version of `digest`, eliminating
+  the duplicate `digest 0.10.7` / `digest 0.11.3` split for this crate.
+
+- **MSRV updated `1.77.2` → `1.85.0`** in `crates/desktop-toolkit/Cargo.toml`,
+  `crates/desktop-toolkit-updater/Cargo.toml`, and
+  `tauri-template/src-tauri-base/Cargo.toml.template`. Transitive dependencies
+  pulled in via `tauri 2.11` (e.g. `serde_spanned 1.1.1`, `toml 0.9`) now use
+  the Rust 2024 edition, which was stabilised in Rust 1.85.0.
+
+- **Tauri template dep tag bumped `v2.3.0` → `v2.3.2`** in
+  `tauri-template/src-tauri-base/Cargo.toml.template`. The template now
+  references the latest published release so new consumer scaffolds pull in
+  current fixes from day one.
+
 ### Added
 
 - **`@chamber-19/stylelint-config`** — new shared stylelint config package at
