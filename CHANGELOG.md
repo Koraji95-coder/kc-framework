@@ -6,6 +6,37 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [2.4.0] - 2026-05-17
+
+### Added
+
+- **`@chamber-19/desktop-toolkit/ai`** — new AI chat module. Drop-in
+  `<ChatPanel lane="..." />` component, `useAIChat()` and `useLanes()`
+  hooks, and a Rust streaming bridge (`crates/desktop-toolkit/src/ai/`)
+  that talks to the Foundry broker's `/api/chat/stream` NDJSON endpoint.
+  Three Tauri commands exposed: `ai_chat_stream`, `ai_list_lanes`,
+  `ai_cancel_stream`. Consumers register a single `AiState` at startup
+  and route chat traffic through Foundry's per-app keys + lane allowlist.
+  Token usage and per-message cost surface in the panel's meta line.
+  Rust client hardened with reqwest `read_timeout(30s)`, 1 MiB buffer
+  cap on partial-line accumulation, and `Arc<AtomicBool>` cancellation.
+- **7 new font-style modes** in the theme system (`themeSystem.js`,
+  `theme.css`): Blueprint, Dense, Typewriter, Petal, Vanity, Cream,
+  Whimsy. Total catalog: 10 modes via the `[data-font-style]` axis.
+  Each mode tunes weight / leading / tracking per role (display, ui,
+  mono) independently of palette selection.
+
+### Changed
+
+- `ToolkitThemeProvider` now imports `theme.css` so the `[data-font-style]`
+  defaults and override blocks are in scope before any consumer or
+  component CSS loads.
+- Package exports map gains `./ai`, `./ai/ChatPanel`, `./ai/useAIChat`,
+  `./ai/useLanes`.
+- `crates/desktop-toolkit` gains `thiserror = "1"` for the AI client's
+  error enum.
+
+
 ### Fixed
 
 - **Rust `digest` version inconsistency**: `digest = "0.10"` was pinned in
@@ -618,7 +649,38 @@ Consumers (e.g. Transmittal Builder) should:
 
 - `python/pyproject.toml` — version bumped to `2.0.0` for consistency.
 
-### [Unreleased] items from v1.1.0 now released
+### [Unreleased]
+
+## [2.4.0] - 2026-05-17
+
+### Added
+
+- **`@chamber-19/desktop-toolkit/ai`** — new AI chat module. Drop-in
+  `<ChatPanel lane="..." />` component, `useAIChat()` and `useLanes()`
+  hooks, and a Rust streaming bridge (`crates/desktop-toolkit/src/ai/`)
+  that talks to the Foundry broker's `/api/chat/stream` NDJSON endpoint.
+  Three Tauri commands exposed: `ai_chat_stream`, `ai_list_lanes`,
+  `ai_cancel_stream`. Consumers register a single `AiState` at startup
+  and route chat traffic through Foundry's per-app keys + lane allowlist.
+  Token usage and per-message cost surface in the panel's meta line.
+  Rust client hardened with reqwest `read_timeout(30s)`, 1 MiB buffer
+  cap on partial-line accumulation, and `Arc<AtomicBool>` cancellation.
+- **7 new font-style modes** in the theme system (`themeSystem.js`,
+  `theme.css`): Blueprint, Dense, Typewriter, Petal, Vanity, Cream,
+  Whimsy. Total catalog: 10 modes via the `[data-font-style]` axis.
+  Each mode tunes weight / leading / tracking per role (display, ui,
+  mono) independently of palette selection.
+
+### Changed
+
+- `ToolkitThemeProvider` now imports `theme.css` so the `[data-font-style]`
+  defaults and override blocks are in scope before any consumer or
+  component CSS loads.
+- Package exports map gains `./ai`, `./ai/ChatPanel`, `./ai/useAIChat`,
+  `./ai/useLanes`.
+- `crates/desktop-toolkit` gains `thiserror = "1"` for the AI client's
+  error enum.
+ items from v1.1.0 now released
 
 ## [1.1.0] — 2026-04-18
 
