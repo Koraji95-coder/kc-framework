@@ -6,6 +6,25 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [2.4.1] - 2026-05-17
+
+### Added
+
+- **`desktop-toolkit::sidecar::spawn_python_dev_backend`** -- moves the
+  Python dev-server fallback (uvicorn auto-spawn from `backend/app.py`)
+  out of consumer apps and into the toolkit. Conda-aware Python lookup
+  (`CONDA_PREFIX`, `~/miniconda3`, `~/Miniconda3`, then `python` on PATH)
+  plus a 2-second early-exit watchdog with `pip install -r requirements.txt`
+  hint. Caller passes the dev port (e.g. 8000 or 8001) so each consumer
+  can keep its existing frontend URL contract. Eliminates ~250 lines of
+  hand-rolled Python-discovery code in every Tauri consumer that runs a
+  FastAPI sidecar.
+
+### Changed
+
+- Python toolkit package version bumped from `2.3.2` to `2.4.1` to match
+  the npm and Cargo crates. The three artefacts now share a single
+  version line.
 ## [2.4.0] - 2026-05-17
 
 ### Added
