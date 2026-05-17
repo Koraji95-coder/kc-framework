@@ -12,7 +12,7 @@
   height: 100vh;
   background: linear-gradient(180deg, var(--ch-bg, #1a1210) 0%, #0a0806 100%);
   color: var(--ch-text, #f0f0f0);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--ch-font-ui, 'Inter', system-ui, sans-serif);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -31,8 +31,8 @@
   inset: 0;
   background-image: repeating-linear-gradient(
     -45deg,
-    rgba(200, 130, 58, 0.025) 0px,
-    rgba(200, 130, 58, 0.025) 1px,
+    rgb(200 130 58 / 0.025) 0,
+    rgb(200 130 58 / 0.025) 1px,
     transparent 1px,
     transparent 8px
   );
@@ -46,7 +46,7 @@
   inset: 0;
   background: radial-gradient(ellipse at center,
     transparent 40%,
-    rgba(0, 0, 0, 0.55) 100%
+    rgb(0 0 0 / 0.55) 100%
   );
   pointer-events: none;
 }
@@ -86,7 +86,7 @@
 
 .updater-subtitle {
   font-size: 11px;
-  color: var(--ch-muted, rgba(156, 163, 175, 0.7));
+  color: var(--ch-muted, rgb(156 163 175 / 0.7));
   letter-spacing: 0.02em;
 }
 
@@ -95,17 +95,17 @@
   width: 100%;
   max-width: 360px;
   height: 6px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgb(255 255 255 / 0.06);
   border-radius: 3px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgb(255 255 255 / 0.05);
   position: relative;
 }
 
 /* Determinate: copper gradient fill */
 .updater-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--ch-accent, #C8823A) 0%, #ffcc66 50%, var(--ch-accent, #C8823A) 100%);
+  background: linear-gradient(90deg, var(--ch-accent, #C8823A) 0%, #fc6 50%, var(--ch-accent, #C8823A) 100%);
   border-radius: 3px;
   transition: width 0.25s ease;
   position: relative;
@@ -122,7 +122,7 @@
   height: 100%;
   background: linear-gradient(90deg,
     transparent 0%,
-    rgba(168, 216, 255, 0.45) 50%,
+    rgb(168 216 255 / 0.45) 50%,
     transparent 100%
   );
   animation: shimmer-slide 2s ease-in-out infinite;
@@ -142,7 +142,7 @@
   left: 0;
   height: 100%;
   width: 40%;
-  background: linear-gradient(90deg, transparent 0%, var(--ch-accent, #C8823A) 40%, #ffcc66 60%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, var(--ch-accent, #C8823A) 40%, #fc6 60%, transparent 100%);
   border-radius: 3px;
   animation: indeterminate-sweep 1.6s ease-in-out infinite;
 }
@@ -164,7 +164,7 @@
   display: inline-block;
   width: 12px;
   height: 12px;
-  border: 2px solid rgba(196, 136, 77, 0.25);
+  border: 2px solid rgb(196 136 77 / 0.25);
   border-top-color: var(--ch-accent, #C4884D);
   border-radius: 50%;
   animation: spin 0.75s linear infinite;
@@ -176,25 +176,25 @@
 }
 
 .updater-phase-label {
-  font-family: ui-monospace, 'JetBrains Mono', 'Fira Code', monospace;
+  font-family: var(--ch-font-mono, ui-monospace, 'JetBrains Mono', 'Fira Code', monospace);
   font-size: 11px;
-  color: var(--ch-accent, rgba(196, 136, 77, 0.9));
+  color: var(--ch-accent, rgb(196 136 77 / 0.9));
   letter-spacing: 0.04em;
 }
 
 /* ── Byte/percent detail for downloading phase ───────────────────────────── */
 .updater-download-detail {
-  font-family: ui-monospace, 'JetBrains Mono', 'Fira Code', monospace;
+  font-family: var(--ch-font-mono, ui-monospace, 'JetBrains Mono', 'Fira Code', monospace);
   font-size: 11px;
-  color: var(--ch-muted, rgba(156, 163, 175, 0.75));
+  color: var(--ch-muted, rgb(156 163 175 / 0.75));
   letter-spacing: 0.02em;
 }
 
 /* ── Status text (contextual hint) ──────────────────────────────────────── */
 .updater-status {
-  font-family: ui-monospace, 'JetBrains Mono', 'Fira Code', monospace;
+  font-family: var(--ch-font-mono, ui-monospace, 'JetBrains Mono', 'Fira Code', monospace);
   font-size: 11px;
-  color: var(--ch-muted, rgba(107, 114, 128, 0.9));
+  color: var(--ch-muted, rgb(107 114 128 / 0.9));
   letter-spacing: 0.02em;
 }
 
@@ -205,8 +205,8 @@
 .updater-notes {
   width: 100%;
   max-width: 360px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--ch-border, rgba(255, 255, 255, 0.06));
+  background: rgb(255 255 255 / 0.04);
+  border: 1px solid var(--ch-border, rgb(255 255 255 / 0.06));
   border-radius: 6px;
   padding: 10px 14px;
   max-height: 72px;
@@ -217,8 +217,8 @@
 .updater-error-block {
   width: 100%;
   max-width: 360px;
-  background: rgba(184, 92, 92, 0.08);
-  border: 1px solid var(--ch-error, rgba(184, 92, 92, 0.35));
+  background: rgb(184 92 92 / 0.08);
+  border: 1px solid var(--ch-error, rgb(184 92 92 / 0.35));
   border-radius: 6px;
   padding: 14px 16px;
   display: flex;
@@ -235,17 +235,17 @@
 
 .updater-error-phase {
   font-size: 11px;
-  color: rgba(156, 163, 175, 0.8);
+  color: rgb(156 163 175 / 0.8);
 }
 
 .updater-error-phase-name {
-  color: var(--ch-accent, rgba(196, 136, 77, 0.9));
+  color: var(--ch-accent, rgb(196 136 77 / 0.9));
 }
 
 .updater-error-message {
-  font-family: ui-monospace, 'JetBrains Mono', 'Fira Code', monospace;
+  font-family: var(--ch-font-mono, ui-monospace, 'JetBrains Mono', 'Fira Code', monospace);
   font-size: 11px;
-  color: var(--ch-error, rgba(217, 119, 119, 0.85));
+  color: var(--ch-error, rgb(217 119 119 / 0.85));
   line-height: 1.5;
   word-break: break-word;
 }
@@ -259,21 +259,21 @@
 
 .updater-error-log-label {
   font-size: 10px;
-  color: rgba(107, 114, 128, 0.8);
+  color: rgb(107 114 128 / 0.8);
   letter-spacing: 0.04em;
 }
 
 .updater-error-logpath {
-  font-family: ui-monospace, 'JetBrains Mono', 'Fira Code', monospace;
+  font-family: var(--ch-font-mono, ui-monospace, 'JetBrains Mono', 'Fira Code', monospace);
   font-size: 10px;
-  color: rgba(156, 163, 175, 0.7);
+  color: rgb(156 163 175 / 0.7);
   word-break: break-all;
 }
 
 /* ── Footer metadata ─────────────────────────────────────────────────────── */
 .updater-footer {
   font-size: 10px;
-  color: var(--ch-muted, rgba(75, 85, 99, 0.7));
+  color: var(--ch-muted, rgb(75 85 99 / 0.7));
   letter-spacing: 0.04em;
   margin-top: 4px;
 }

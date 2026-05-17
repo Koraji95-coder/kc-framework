@@ -89,6 +89,53 @@ export const TOOLKIT_THEME_FIELDS = [
   { key: 'info', label: 'Info' },
 ];
 
+// ── data-font-style axis ──────────────────────────────────────────────
+// Orthogonal to the color palette: each mode swaps font weight, leading,
+// and tracking on the same three semantic font families (display / ui /
+// mono). Selecting a mode sets the `data-font-style` attribute on the
+// theme root and writes the mode's tokens onto :root via JS. Consumer
+// apps can also override per-element with [data-font-style="..."] CSS
+// selectors if they declare matching :root, [data-font-style] rules.
+//
+// Modes intentionally do NOT change the font-family — Chamber-19 brand
+// fonts (DM Sans / Instrument Serif / JetBrains Mono) stay consistent
+// across all modes. Only weight / leading / tracking move.
+export const TOOLKIT_FONT_STYLE_MODES = [
+  {
+    id: 'default',
+    label: 'Default',
+    description: 'Chamber-19 standard. Calm, engineering-grade.',
+    weight: { display: 400, ui: 400, mono: 400 },
+    leading: { display: 1.25, ui: 1.5, mono: 1.45 },
+    tracking: { display: '0.01em', ui: '0em', mono: '0em' },
+  },
+  {
+    id: 'technical',
+    label: 'Technical',
+    description: 'Tighter leading, heavier weight, wider tracking for tabular data.',
+    weight: { display: 600, ui: 500, mono: 500 },
+    leading: { display: 1.2, ui: 1.45, mono: 1.4 },
+    tracking: { display: '0.02em', ui: '0.01em', mono: '0.02em' },
+  },
+  {
+    id: 'lofi',
+    label: 'Lo-fi',
+    description: 'Lighter weight and more generous leading for documentation reads.',
+    weight: { display: 400, ui: 300, mono: 400 },
+    leading: { display: 1.3, ui: 1.6, mono: 1.5 },
+    tracking: { display: '0.02em', ui: '0.02em', mono: '0em' },
+  },
+];
+
+const DEFAULT_FONT_STYLE_MODE = TOOLKIT_FONT_STYLE_MODES[0];
+
+function findFontStyleMode(modeId) {
+  return (
+    TOOLKIT_FONT_STYLE_MODES.find((mode) => mode.id === modeId) ||
+    DEFAULT_FONT_STYLE_MODE
+  );
+}
+
 const DEFAULT_PALETTE = TOOLKIT_PALETTES[0];
 
 function clonePaletteColors(paletteId) {
@@ -110,6 +157,7 @@ export function getDefaultToolkitThemeState() {
     paletteId: DEFAULT_PALETTE.id,
     useCustomColors: false,
     customColors: clonePaletteColors(DEFAULT_PALETTE.id),
+    fontStyleMode: DEFAULT_FONT_STYLE_MODE.id,
   };
 }
 
@@ -134,10 +182,17 @@ export function loadToolkitThemeState(storageKey = THEME_STORAGE_KEY) {
       customColors[field.key] = normalizeHex(parsed?.customColors?.[field.key], baseColors[field.key]);
     }
 
+    const fontStyleMode = TOOLKIT_FONT_STYLE_MODES.some(
+      (mode) => mode.id === parsed?.fontStyleMode,
+    )
+      ? parsed.fontStyleMode
+      : fallback.fontStyleMode;
+
     return {
       paletteId,
       useCustomColors: Boolean(parsed?.useCustomColors),
       customColors,
+      fontStyleMode,
     };
   } catch {
     return fallback;
@@ -157,10 +212,37 @@ export function resolveToolkitTheme(themeState) {
   const colors = themeState.useCustomColors
     ? { ...palette.colors, ...themeState.customColors }
     : { ...palette.colors };
+  const fontStyleMode = findFontStyleMode(themeState.fontStyleMode);
 
   return {
     palette,
     colors,
+    fontStyleMode,
+  };
+}
+
+/**
+ * Resolve the typography tokens for a given font-style mode id.
+ * Returns an object mapping CSS variable names to values, suitable
+ * for direct passing to `target.style.setProperty(...)`.
+ *
+ * Use this when consumer apps want to apply the mode tokens to a
+ * sub-tree only (e.g. a `<section data-font-style="technical">`)
+ * rather than the whole document — the canonical app-wide hook is
+ * `applyToolkitThemeVariables` which sets these automatically.
+ */
+export function resolveFontStyleTokens(modeId) {
+  const mode = findFontStyleMode(modeId);
+  return {
+    '--ch-font-weight-display': String(mode.weight.display),
+    '--ch-font-weight-ui': String(mode.weight.ui),
+    '--ch-font-weight-mono': String(mode.weight.mono),
+    '--ch-font-leading-display': String(mode.leading.display),
+    '--ch-font-leading-ui': String(mode.leading.ui),
+    '--ch-font-leading-mono': String(mode.leading.mono),
+    '--ch-font-tracking-display': mode.tracking.display,
+    '--ch-font-tracking-ui': mode.tracking.ui,
+    '--ch-font-tracking-mono': mode.tracking.mono,
   };
 }
 
@@ -170,7 +252,11 @@ export function applyToolkitThemeVariables(theme, target = document.documentElem
   }
 
   for (const [key, value] of Object.entries(theme.colors)) {
-    target.style.setProperty(`--ch-${key}`, value);
+    // Convert camelCase JS keys (`accentText`) to kebab-case CSS variables
+    // (`--ch-accent-text`) — CSS_DISCIPLINE requires kebab-case for the
+    // --ch-* token contract.
+    const kebabKey = key.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`);
+    target.style.setProperty(`--ch-${kebabKey}`, value);
   }
 
   // Derive and apply edge-melt variables from the resolved palette. These
@@ -181,6 +267,19 @@ export function applyToolkitThemeVariables(theme, target = document.documentElem
   const edgeMelt = resolveEdgeMeltVariables(theme.colors);
   for (const [name, value] of Object.entries(edgeMelt)) {
     target.style.setProperty(name, value);
+  }
+
+  // Apply the data-font-style axis: write the mode's weight/leading/
+  // tracking tokens onto the target and set the matching attribute so
+  // CSS rules `:root, [data-font-style="X"]` (declared in consumer apps
+  // or the toolkit's _theme.override.css) can re-derive locally too.
+  const fontModeId = theme.fontStyleMode?.id || DEFAULT_FONT_STYLE_MODE.id;
+  const fontTokens = resolveFontStyleTokens(fontModeId);
+  for (const [name, value] of Object.entries(fontTokens)) {
+    target.style.setProperty(name, value);
+  }
+  if (typeof target.setAttribute === 'function') {
+    target.setAttribute('data-font-style', fontModeId);
   }
 }
 

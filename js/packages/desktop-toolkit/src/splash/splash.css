@@ -11,16 +11,18 @@
 .splash-root {
   width: 680px;
   height: 460px;
+
   /* Warm forge gradient: near-black mahogany top → absolute black bottom */
   background: linear-gradient(180deg, #1a1210 0%, #0a0806 100%);
   overflow: hidden;
   position: relative;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--ch-font-ui, 'Inter', system-ui, sans-serif);
   user-select: none;
   cursor: default;
   opacity: 1;
   transition: opacity 1s ease;
 }
+
 /* Cross-fade the entire splash (background + content) when the startup
    sequence signals fade-now. This is what eliminates the "brown card sits
    empty for a few seconds" gap between the previous content fade-out and
@@ -37,8 +39,8 @@
   inset: 0;
   background-image: repeating-linear-gradient(
     -45deg,
-    rgba(200, 130, 58, 0.03) 0px,
-    rgba(200, 130, 58, 0.03) 1px,
+    rgb(200 130 58 / 0.03) 0,
+    rgb(200 130 58 / 0.03) 1px,
     transparent 1px,
     transparent 8px
   );
@@ -52,7 +54,7 @@
   inset: 0;
   background: radial-gradient(ellipse at center,
     transparent 35%,
-    rgba(0, 0, 0, 0.65) 100%
+    rgb(0 0 0 / 0.65) 100%
   );
   pointer-events: none;
   z-index: 0;
@@ -75,9 +77,11 @@
   opacity: 0;
   transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 .splash-content.visible {
   opacity: 1;
 }
+
 .splash-content.fading-out {
   opacity: 0;
   transition: opacity 1s ease;
@@ -94,7 +98,7 @@
 
 /* ── App title (TRANSMITTAL BUILDER wordmark) ───────────────────────────── */
 .app-title {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--ch-font-ui, 'Inter', system-ui, sans-serif);
   font-size: 12px;
   font-weight: 700;
   font-variant: small-caps;
@@ -105,21 +109,23 @@
   opacity: 0;
   transition: opacity 0.6s ease;
 }
+
 .app-title.visible {
   opacity: 1;
 }
 
 /* ── Subtitle: ENGINEERED TO DELIVER ───────────────────────────────────── */
 .subtitle {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--ch-font-ui, 'Inter', system-ui, sans-serif);
   font-size: 9px;
   font-variant: small-caps;
   letter-spacing: 0.14em;
-  color: rgba(200, 130, 58, 0.65);
+  color: rgb(200 130 58 / 0.65);
   margin-top: 3px;
   margin-bottom: 0;
   line-height: 1;
 }
+
 .sub-tag {
   letter-spacing: 0.14em;
 }
@@ -176,6 +182,7 @@
 .forge-scene .tooth-glow-12 {
   animation: tooth-heat-pulse 1.4s 0.7s ease-out infinite;
 }
+
 .forge-scene .tooth-glow-11,
 .forge-scene .tooth-glow-13 {
   animation: tooth-heat-pulse 1.4s 0.72s ease-out infinite;
@@ -215,14 +222,30 @@
 .forge-scene .spark-7 { animation: spark-fly-7 1.4s 0.73s ease-out infinite; }
 .forge-scene .spark-8 { animation: spark-fly-8 1.4s 0.70s ease-out infinite; }
 
-/* Direction 1: upper-left  */ @keyframes spark-fly-1 { 0%{transform:translate(0,0);opacity:0} 3%{opacity:1} 35%{transform:translate(-28px,-38px);opacity:0} 100%{transform:translate(-28px,-38px);opacity:0} }
-/* Direction 2: upper       */ @keyframes spark-fly-2 { 0%{transform:translate(0,0);opacity:0} 3%{opacity:1} 35%{transform:translate(-4px,-44px);opacity:0}  100%{transform:translate(-4px,-44px);opacity:0}  }
-/* Direction 3: upper-left  */ @keyframes spark-fly-3 { 0%{transform:translate(0,0);opacity:0} 3%{opacity:1} 35%{transform:translate(-26px,-40px);opacity:0} 100%{transform:translate(-26px,-40px);opacity:0} }
-/* Direction 4: far-left    */ @keyframes spark-fly-4 { 0%{transform:translate(0,0);opacity:0} 3%{opacity:1} 35%{transform:translate(-42px,-10px);opacity:0} 100%{transform:translate(-42px,-10px);opacity:0} }
-/* Direction 5: lower-left  */ @keyframes spark-fly-5 { 0%{transform:translate(0,0);opacity:0} 3%{opacity:1} 35%{transform:translate(-34px,28px);opacity:0}  100%{transform:translate(-34px,28px);opacity:0}  }
-/* Direction 6: lower-left  */ @keyframes spark-fly-6 { 0%{transform:translate(0,0);opacity:0} 3%{opacity:1} 35%{transform:translate(-32px,22px);opacity:0}  100%{transform:translate(-32px,22px);opacity:0}  }
-/* Direction 7: left        */ @keyframes spark-fly-7 { 0%{transform:translate(0,0);opacity:0} 3%{opacity:1} 35%{transform:translate(-44px,-6px);opacity:0}  100%{transform:translate(-44px,-6px);opacity:0}  }
-/* Direction 8: diagonal UL */ @keyframes spark-fly-8 { 0%{transform:translate(0,0);opacity:0} 3%{opacity:1} 35%{transform:translate(-20px,-48px);opacity:0} 100%{transform:translate(-20px,-48px);opacity:0} }
+/* Direction 1: upper-left  */
+
+ @keyframes spark-fly-1 { 0%{transform:translate(0,0);opacity:0} 3%{opacity:1} 35%{transform:translate(-28px,-38px);opacity:0} 100%{transform:translate(-28px,-38px);opacity:0} }
+/* Direction 2: upper       */
+
+ @keyframes spark-fly-2 { 0%{transform:translate(0,0);opacity:0} 3%{opacity:1} 35%{transform:translate(-4px,-44px);opacity:0}  100%{transform:translate(-4px,-44px);opacity:0}  }
+/* Direction 3: upper-left  */
+
+ @keyframes spark-fly-3 { 0%{transform:translate(0,0);opacity:0} 3%{opacity:1} 35%{transform:translate(-26px,-40px);opacity:0} 100%{transform:translate(-26px,-40px);opacity:0} }
+/* Direction 4: far-left    */
+
+ @keyframes spark-fly-4 { 0%{transform:translate(0,0);opacity:0} 3%{opacity:1} 35%{transform:translate(-42px,-10px);opacity:0} 100%{transform:translate(-42px,-10px);opacity:0} }
+/* Direction 5: lower-left  */
+
+ @keyframes spark-fly-5 { 0%{transform:translate(0,0);opacity:0} 3%{opacity:1} 35%{transform:translate(-34px,28px);opacity:0}  100%{transform:translate(-34px,28px);opacity:0}  }
+/* Direction 6: lower-left  */
+
+ @keyframes spark-fly-6 { 0%{transform:translate(0,0);opacity:0} 3%{opacity:1} 35%{transform:translate(-32px,22px);opacity:0}  100%{transform:translate(-32px,22px);opacity:0}  }
+/* Direction 7: left        */
+
+ @keyframes spark-fly-7 { 0%{transform:translate(0,0);opacity:0} 3%{opacity:1} 35%{transform:translate(-44px,-6px);opacity:0}  100%{transform:translate(-44px,-6px);opacity:0}  }
+/* Direction 8: diagonal UL */
+
+ @keyframes spark-fly-8 { 0%{transform:translate(0,0);opacity:0} 3%{opacity:1} 35%{transform:translate(-20px,-48px);opacity:0} 100%{transform:translate(-20px,-48px);opacity:0} }
 
 /* ── Terminal block ──────────────────────────────────────────────────────── */
 .terminal-block {
@@ -230,7 +253,7 @@
   max-height: 96px;
   overflow: hidden;
   margin-top: 4px;
-  font-family: ui-monospace, 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Menlo, Consolas, monospace;
+  font-family: var(--ch-font-mono, ui-monospace, 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Menlo, Consolas, monospace);
   font-size: 11px;
   line-height: 1.65;
   color: #9CA3AF;
@@ -245,10 +268,10 @@
   inset: 0;
   background: repeating-linear-gradient(
     to bottom,
-    transparent 0px,
+    transparent 0,
     transparent 1px,
-    rgba(0, 0, 0, 0.03) 1px,
-    rgba(0, 0, 0, 0.03) 2px
+    rgb(0 0 0 / 0.03) 1px,
+    rgb(0 0 0 / 0.03) 2px
   );
   pointer-events: none;
   z-index: 10;
@@ -264,11 +287,11 @@
 
 /* Gutter line number */
 .terminal-gutter-num {
-  color: rgba(107, 174, 196, 0.6);
+  color: rgb(107 174 196 / 0.6);
   min-width: 22px;
   text-align: right;
   flex-shrink: 0;
-  border-right: 1px solid rgba(107, 174, 196, 0.15);
+  border-right: 1px solid rgb(107 174 196 / 0.15);
   padding-right: 6px;
   margin-right: 2px;
   font-variant-numeric: tabular-nums;
@@ -327,18 +350,20 @@
   width: 420px;
   margin: 8px auto 4px;
   height: 3px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgb(255 255 255 / 0.06);
   border-radius: 2px;
   overflow: hidden;
   opacity: 0;
   transition: opacity 0.8s ease 0.8s;
 }
+
 .progress-track.visible {
   opacity: 1;
 }
+
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #C8823A 0%, #ffcc66 50%, #C8823A 100%);
+  background: linear-gradient(90deg, #C8823A 0%, #fc6 50%, #C8823A 100%);
   border-radius: 2px;
   width: 0%;
   transition: width 600ms cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -352,16 +377,17 @@
   left: 0;
   right: 0;
   text-align: center;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--ch-font-ui, 'Inter', system-ui, sans-serif);
   font-size: 10px;
-  color: rgba(156, 163, 175, 0.75);
+  color: rgb(156 163 175 / 0.75);
   letter-spacing: 0.04em;
   z-index: 5;
   padding: 6px 0 4px;
-  background: linear-gradient(180deg, transparent 0%, rgba(10, 8, 6, 0.85) 40%, rgba(10, 8, 6, 0.95) 100%);
+  background: linear-gradient(180deg, transparent 0%, rgb(10 8 6 / 0.85) 40%, rgb(10 8 6 / 0.95) 100%);
   opacity: 0;
   transition: opacity 0.8s ease 1.2s;
 }
+
 .version-meta.visible {
   opacity: 1;
 }

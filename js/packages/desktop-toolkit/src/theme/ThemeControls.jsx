@@ -1,4 +1,9 @@
-import { TOOLKIT_PALETTES, TOOLKIT_THEME_FIELDS, createToolkitThemeFromPalette } from './themeSystem.js';
+import {
+  TOOLKIT_PALETTES,
+  TOOLKIT_THEME_FIELDS,
+  TOOLKIT_FONT_STYLE_MODES,
+  createToolkitThemeFromPalette,
+} from './themeSystem.js';
 
 export function ToolkitThemeControls({
   themeState,
@@ -15,6 +20,14 @@ export function ToolkitThemeControls({
     onThemeStateChange((previous) => ({
       ...previous,
       useCustomColors: checked,
+    }));
+  }
+
+  function handleFontStyleChange(event) {
+    const nextMode = event.target.value;
+    onThemeStateChange((previous) => ({
+      ...previous,
+      fontStyleMode: nextMode,
     }));
   }
 
@@ -73,6 +86,24 @@ export function ToolkitThemeControls({
           ))}
         </select>
         <span>{TOOLKIT_PALETTES.find((item) => item.id === themeState.paletteId)?.description}</span>
+      </label>
+
+      <label style={labelStyle}>
+        Font style
+        <select
+          value={themeState.fontStyleMode || TOOLKIT_FONT_STYLE_MODES[0].id}
+          onChange={handleFontStyleChange}
+          style={inputStyle}
+        >
+          {TOOLKIT_FONT_STYLE_MODES.map((mode) => (
+            <option key={mode.id} value={mode.id}>{mode.label}</option>
+          ))}
+        </select>
+        <span>
+          {TOOLKIT_FONT_STYLE_MODES.find(
+            (mode) => mode.id === (themeState.fontStyleMode || TOOLKIT_FONT_STYLE_MODES[0].id),
+          )?.description}
+        </span>
       </label>
 
       <label style={{ ...labelStyle, flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
