@@ -1,6 +1,6 @@
 [package]
 name = "desktop-toolkit"
-version = "2.5.0"
+version = "2.6.0"
 description = "Shared Tauri framework crate for chamber-19 desktop tools"
 authors = ["Koraji"]
 license = "MIT"
