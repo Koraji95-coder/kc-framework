@@ -6,6 +6,35 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [2.4.2] - 2026-05-17
+
+### Added
+
+- **`splash::emit_status_step(app, phase, message)`** -- convenience wrapper
+  that emits a Pending then Ok status back-to-back for steps where there is
+  no real work to perform between the emissions (informational status lines,
+  no-op pre-checks). Replaces the duplicate-line pattern seen across DLM and
+  the tauri-template.
+- **`splash::transition_to_main_window(app, hold_ms, fade_ms, safety_ms)`**
+  -- encapsulates the splash-to-main cross-fade choreography (emit
+  `splash://fade-now`, sleep for `hold + fade + safety`, then run the
+  show-main / close-splash dance on the main thread). Must be called from a
+  background thread because it blocks for the full duration. Moves ~18
+  lines of identical orchestration out of every Tauri consumer.
+- **`sidecar::handle_window_destroyed(event, child_arc)`** -- Tauri
+  `on_window_event` handler that kills the spawned sidecar child when any
+  window is destroyed. Replaces a 12-line `WindowEvent::Destroyed` match
+  block consumers have been duplicating since the v2 sidecar API.
+- **`updater::set_default_update_path(path)`** -- centralises the
+  `std::env::set_var(UPDATE_PATH_ENV_VAR, default)` boilerplate (with the
+  required `unsafe` block + safety comment) into the toolkit. Honors any
+  externally-set value, so launcher or test harnesses can still override.
+  Must be called before `tauri::Builder::default()` so the env write
+  happens while the process is still single-threaded.
+
+### Changed
+
+- npm / Cargo / PyPI all bump to `2.4.2` together.
 ## [2.4.1] - 2026-05-17
 
 ### Added

@@ -114,6 +114,37 @@ pub fn spawn_sidecar(sidecar_path: &PathBuf) -> Result<(Child, u16), String> {
     Ok((child, actual_port))
 }
 
+// -- Window-event cleanup --------------------------------------------------
+
+/// Tauri `on_window_event` handler that kills the spawned sidecar child when
+/// any window is destroyed.
+///
+/// Consumers wire this into `tauri::Builder::on_window_event` so the sidecar
+/// process does not outlive the app -- replacing the boilerplate `match` on
+/// `WindowEvent::Destroyed` that every consumer would otherwise re-implement.
+///
+/// # Example
+///
+/// ```ignore
+/// .on_window_event({
+///     let child_cleanup = child.clone();
+///     move |_window, event| sidecar::handle_window_destroyed(event, &child_cleanup)
+/// })
+/// ```
+pub fn handle_window_destroyed(
+    event: &tauri::WindowEvent,
+    child_arc: &Arc<Mutex<Option<Child>>>,
+) {
+    if let tauri::WindowEvent::Destroyed = event {
+        let mut proc_opt = child_arc.lock().unwrap().take();
+        if let Some(ref mut proc) = proc_opt {
+            println!("[sidecar] Stopping backend sidecar (PID {})", proc.id());
+            let _ = proc.kill();
+            let _ = proc.wait();
+        }
+    }
+}
+
 // -- Python dev-server fallback --------------------------------------------
 
 /// Spawn `python -m uvicorn app:app --port <port>` from the repository's
