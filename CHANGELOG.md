@@ -6,6 +6,68 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [2.6.0] - 2026-05-17
+
+### Added
+
+- **`<AiChatShell>`** -- composable AI chat shell with named render
+  slots. Wires `useAIChat` internally (streaming, NDJSON, request
+  lifecycle, cancel) and exposes:
+
+  ```
+  <AiChatShell
+    lane="..."
+    renderHeader={(ctx) => ...}
+    renderMessage={(m, i) => ...}
+    renderEmpty={() => ...}
+    renderMeta={(meta) => ...}
+    renderError={(err) => ...}
+    renderInput={(ctx) => ...}
+  />
+  ```
+
+  Default slots mirror the original `<ChatPanel>` layout so apps can
+  upgrade incrementally -- override one slot at a time, leave the
+  rest as default.
+
+- **Four standalone building blocks** for apps that want full layout
+  control without writing the boring parts:
+  - `<AiChatMessages messages renderMessage emptyState />` -- scrolling
+    list with auto-scroll-to-bottom on new content
+  - `<AiChatInput onSend onCancel isStreaming />` -- input + send /
+    cancel with controlled or uncontrolled draft state
+  - `<AiChatMeta meta />` -- lane / model / tokens / cost summary
+  - `<AiChatError error />` -- error banner
+
+  Each is exported standalone so apps can compose their own panel from
+  the parts (call `useAIChat` directly + assemble) or skip pieces they
+  don't want.
+
+- **New JS package exports**: `./ai/shell`, `./ai/messages`,
+  `./ai/input`, `./ai/meta`, `./ai/error`. Use deep paths to import
+  individual building blocks without pulling in the whole AI bundle.
+
+### Changed
+
+- `<ChatPanel>` (existing easy-mode drop-in) is now a thin wrapper
+  around `<AiChatShell>` with no behavior change. All existing
+  consumers continue to work unchanged; the chest of toys underneath
+  is now reachable for apps that want custom design.
+
+- npm + Cargo + PyPI bump 2.5.0 -> 2.6.0 in lockstep.
+
+### Why this exists
+
+Each Chamber 19 app that wants AI chat ends up reinventing the same
+panel: message list with auto-scroll, streaming-friendly state, send +
+cancel, error banner, meta line. The shell lifts that boring surface
+into the toolkit while leaving every visual decision (header chrome,
+message bubble shape, input area styling, tool-call rendering) to
+the consumer app.
+
+Pairs with the Foundry broker -- consumer apps gain new AI
+capabilities by adding a lane in `foundry.settings.json` and dropping
+in `<AiChatShell lane="..." />` with the per-app custom slots.
 ## [2.5.0] - 2026-05-17
 
 ### Added
