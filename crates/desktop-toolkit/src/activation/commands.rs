@@ -20,7 +20,7 @@
 
 use tauri::AppHandle;
 
-use super::{activation_status, activate_with_pin, check_activation, deactivate, ActivationResult};
+use super::{activation_status, activate_with_pin, check_activation, deactivate, issue_bearer_token, ActivationResult};
 
 /// Returns `true` when the local activation token is valid, unexpired, and
 /// machine-bound to the current host.  No network call is made.
@@ -53,4 +53,22 @@ pub async fn toolkit_activate_with_pin(
 #[tauri::command]
 pub fn toolkit_deactivate(app: AppHandle) -> Result<(), String> {
     deactivate(&app)
+}
+
+/// Issue a short-lived HMAC bearer token for backend HTTP authorization.
+///
+/// Returns `Err` when the local activation token is missing, tampered,
+/// machine-mismatched, or expired.  Consumers attach the returned string
+/// as `Authorization: Bearer <token>` on outbound fetches; backends
+/// verify by re-deriving the expected HMAC using the shared
+/// `ACTIVATION_HMAC_SECRET`.  See the Python verifier helper at
+/// `chamber19_desktop_toolkit.auth.verify_toolkit_bearer` for a
+/// drop-in FastAPI `Depends`.
+///
+/// Token TTL is ~60 seconds with +/-1 minute clock-skew tolerance on
+/// the verifier side. Consumers should call this command per-request
+/// rather than caching the result.
+#[tauri::command]
+pub fn toolkit_get_bearer_token(app: AppHandle) -> Result<String, String> {
+    issue_bearer_token(&app)
 }

@@ -6,6 +6,60 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [2.5.0] - 2026-05-17
+
+### Added
+
+- **`activation::issue_bearer_token` + `toolkit_get_bearer_token` Tauri command**
+  -- short-lived HMAC-signed bearer token for backend HTTP authorization.
+  The token has the shape `v1.{machine_id}.{minute_ts}.{base64-hmac-sha256}`
+  where the HMAC covers `{machine_id}|{minute_ts}` with the same
+  `ACTIVATION_HMAC_SECRET` used for activation tokens. Backends verify by
+  re-deriving the HMAC, validating the minute_ts is within +-1 minute of
+  now, and constant-time comparing. The bearer can only be issued when
+  the local activation token verifies, so backend access is gated by
+  valid activation transitively.
+- **`chamber19_desktop_toolkit.auth`** (Python) -- ships
+  `verify_toolkit_bearer(token)`, `require_toolkit_bearer(...)`, and a
+  prebuilt FastAPI Depends `toolkit_bearer_dep`. Drop-in for any
+  FastAPI backend that wants to authenticate launcher-routed traffic.
+  Reads `ACTIVATION_HMAC_SECRET` from the backend's environment.
+- **`@chamber-19/desktop-toolkit/activation/bearer`** (JS) -- exports
+  `getToolkitBearer()`, `useToolkitBearer()` React hook, and
+  `withToolkitBearer(init)` fetch-init wrapper. Returns a fresh token
+  per call -- consumers should not cache.
+
+### Changed
+
+- **HMAC sentinel hardened.** `ACTIVATION_HMAC_SECRET` is now a
+  compile-time requirement for release builds (`env!()` produces a
+  compile error if unset). Debug builds keep a sentinel fallback so
+  local development works, but the sentinel value is renamed to
+  `"dev-only-insecure-hmac-key-DO-NOT-SHIP-rebuild-with-env-set"` to
+  make the intent obvious in any forensic. A release binary can no
+  longer ship signed with the dev sentinel by accident.
+
+### Migration
+
+A consumer that wants to authenticate backend HTTP calls with the
+toolkit bearer:
+
+1. Bump pin to `v2.5.0` in the consumer Cargo.toml + npm package.json.
+2. On the desktop side: replace any bespoke
+   `withActivationHeaders(init)` / Bearer-injection with
+   ```js
+   import { withToolkitBearer } from "@chamber-19/desktop-toolkit/activation/bearer";
+   await fetch(url, await withToolkitBearer({ method: "POST", body }));
+   ```
+3. On the backend side:
+   ```python
+   from chamber19_desktop_toolkit.auth import toolkit_bearer_dep
+   @app.get("/api/protected")
+   def protected(claims = Depends(toolkit_bearer_dep)):
+       return {"machine_id": claims["machine_id"]}
+   ```
+4. Set `ACTIVATION_HMAC_SECRET` on the backend env, matching the value
+   the desktop binary was compiled with.
 ## [2.4.2] - 2026-05-17
 
 ### Added
