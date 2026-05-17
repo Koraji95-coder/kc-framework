@@ -20,9 +20,25 @@ use super::ActivationResult;
 
 // ── Compile-time secrets ──────────────────────────────────────────────────
 
+/// HMAC secret used to sign activation tokens and short-lived bearer
+/// tokens. Must be identical to the secret the verifying backend uses.
+///
+/// Release builds: `env!()` is a compile-time error if the env var is unset,
+/// so a release binary CANNOT ship with the dev sentinel by accident.
+/// Debug builds: a sentinel string is allowed so local development works
+/// without configuring secrets, but tokens issued under the sentinel will
+/// not validate against any production backend.
+#[cfg(not(debug_assertions))]
+const ACTIVATION_HMAC_SECRET: &str = env!(
+    "ACTIVATION_HMAC_SECRET",
+    "ACTIVATION_HMAC_SECRET must be set at build time for release builds. \
+     Inject via the build environment, e.g. `ACTIVATION_HMAC_SECRET=... cargo build --release`."
+);
+
+#[cfg(debug_assertions)]
 const ACTIVATION_HMAC_SECRET: &str = match option_env!("ACTIVATION_HMAC_SECRET") {
     Some(s) => s,
-    None => "dev-only-insecure-hmac-key-DO-NOT-SHIP",
+    None => "dev-only-insecure-hmac-key-DO-NOT-SHIP-rebuild-with-env-set",
 };
 
 /// Hard expiry: tokens are valid for this many days from issuance.
@@ -251,4 +267,64 @@ pub fn delete_token(app: &tauri::AppHandle) -> Result<(), String> {
         std::fs::remove_file(&path).map_err(|e| format!("Cannot remove token: {e}"))?;
     }
     Ok(())
+}
+
+
+// -- Short-lived bearer token for backend HTTP auth -----------------------
+//
+// Backends verify these by re-deriving the expected HMAC. The token payload
+// is base64(`{machine_id}|{minute_ts}|{base64-hmac-over-{machine_id}|{minute_ts}}`).
+// Backend accepts current minute and previous minute to tolerate clock skew.
+//
+// The bearer can only be issued when the local activation token verifies, so
+// the machine binding and expiry checks from `verify_token` flow through.
+// This means a backend that trusts a valid bearer transitively trusts the
+// toolkit's machine-bound activation.
+
+const BEARER_TOKEN_VERSION: &str = "v1";
+
+/// Current minute since the Unix epoch.  Truncated to minute granularity so
+/// a token is valid for at most ~60 seconds (+/-1 minute on the verifier
+/// side for clock skew).
+fn current_minute_ts() -> u64 {
+    use std::time::{SystemTime, UNIX_EPOCH};
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_secs() / 60)
+        .unwrap_or(0)
+}
+
+fn sign_bearer(machine_id: &str, minute_ts: u64) -> String {
+    let message = format!("{machine_id}|{minute_ts}");
+    let mut mac = HmacSha256::new_from_slice(ACTIVATION_HMAC_SECRET.as_bytes())
+        .expect("HMAC accepts any key length");
+    mac.update(message.as_bytes());
+    STANDARD.encode(mac.finalize().into_bytes())
+}
+
+/// Issue a short-lived HMAC bearer token for backend HTTP auth.
+///
+/// Validates the local activation token first; if the user is not activated
+/// (or token is tampered, machine-bound to a different host, or expired),
+/// returns `Err`. Otherwise returns a base64-encoded compact token of the
+/// shape:
+///
+/// ```text
+/// v1.{machine_id}.{minute_ts}.{base64-hmac}
+/// ```
+///
+/// Consumers attach this as `Authorization: Bearer <token>` on outbound
+/// fetches.  The minute-truncated timestamp bounds replay attacks to a
+/// roughly 60-second window.
+pub fn issue_bearer_token(app: &tauri::AppHandle) -> Result<String, String> {
+    // Refuse to issue a bearer when the machine is not activated -- this
+    // means backend access is gated by activation in addition to whatever
+    // checks the bearer verifier performs.
+    let stored = verify_token(app)?;
+    let minute_ts = current_minute_ts();
+    let sig = sign_bearer(&stored.machine_id, minute_ts);
+    Ok(format!(
+        "{BEARER_TOKEN_VERSION}.{}.{minute_ts}.{sig}",
+        stored.machine_id
+    ))
 }

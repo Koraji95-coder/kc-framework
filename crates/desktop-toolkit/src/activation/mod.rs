@@ -77,3 +77,13 @@ pub fn deactivate(app: &AppHandle) -> Result<(), String> {
 pub fn activation_status(app: &AppHandle) -> Result<ActivationResult, String> {
     token::token_status(app)
 }
+
+/// Issue a short-lived HMAC bearer token for backend HTTP authorization.
+///
+/// Wraps `token::issue_bearer_token`. See its docstring for the token format
+/// and the verification protocol. Returns `Err` when the local activation
+/// token is missing, tampered, machine-mismatched, or expired -- so backend
+/// access through this bearer is gated by valid activation.
+pub fn issue_bearer_token(app: &AppHandle) -> Result<String, String> {
+    token::issue_bearer_token(app)
+}

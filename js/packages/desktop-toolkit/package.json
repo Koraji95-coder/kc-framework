@@ -1,6 +1,6 @@
 {
   "name": "@chamber-19/desktop-toolkit",
-  "version": "2.4.2",
+  "version": "2.5.0",
   "description": "Shared JS/React primitives for chamber-19 desktop tools",
   "license": "MIT",
   "type": "module",
@@ -10,6 +10,7 @@
     "./updater": "./src/updater/index.jsx",
     "./activation": "./src/activation/ActivationGate.jsx",
     "./activation/hook": "./src/activation/useActivation.js",
+    "./activation/bearer": "./src/activation/bearer.js",
     "./components/UpdateModal": "./src/components/UpdateModal/UpdateModal.jsx",
     "./components/ReleaseNotes": "./src/components/ReleaseNotes/ReleaseNotes.jsx",
     "./theme": "./src/theme/index.js",
