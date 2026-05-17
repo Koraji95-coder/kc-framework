@@ -101,11 +101,26 @@
       );
     }
 
+
+    :root {
+      /* Font style tokens — default mode. JS overwrites these via applyColors(). */
+      --ch-font-weight-display: 400;
+      --ch-font-weight-ui: 400;
+      --ch-font-weight-mono: 400;
+      --ch-font-leading-display: 1.25;
+      --ch-font-leading-ui: 1.5;
+      --ch-font-leading-mono: 1.45;
+      --ch-font-tracking-display: 0.01em;
+      --ch-font-tracking-ui: 0;
+      --ch-font-tracking-mono: 0;
+    }
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
       font-family: var(--ch-font-ui);
+      font-weight: var(--ch-font-weight-ui);
+      line-height: var(--ch-font-leading-ui);
       color: var(--ch-text);
       background:
         radial-gradient(1000px 600px at 15% -10%, color-mix(in srgb, var(--ch-accent) 18%, transparent), transparent 60%),
@@ -146,7 +161,7 @@
     .sub {
       color: var(--ch-muted);
       font-size: 13px;
-      line-height: 1.45;
+      line-height: var(--ch-font-leading-ui);
       margin-top: 8px;
     }
 
@@ -352,10 +367,10 @@
     .scaffold-brand-name {
       font-family: var(--ch-font-display);
       font-size: 16px;
-      font-weight: 400;
+      font-weight: var(--ch-font-weight-display);
       color: var(--ch-text);
       letter-spacing: 0.01em;
-      line-height: 1.1;
+      line-height: var(--ch-font-leading-display);
     }
 
     .scaffold-brand-tag {
@@ -430,10 +445,10 @@
     .scaffold-profile-name {
       font-family: var(--ch-font-ui);
       font-size: 13px;
-      font-weight: 600;
+      font-weight: var(--ch-font-weight-ui);
       color: var(--ch-text);
       letter-spacing: -0.005em;
-      line-height: 1.2;
+      line-height: var(--ch-font-leading-ui);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -501,7 +516,7 @@
       color: var(--ch-muted);
       font-family: var(--ch-font-ui);
       font-size: 13px;
-      font-weight: 500;
+      font-weight: var(--ch-font-weight-ui);
       letter-spacing: -0.005em;
       text-align: left;
       cursor: pointer;
@@ -653,10 +668,10 @@
     .scaffold-topbar-title {
       font-family: var(--ch-font-display);
       font-size: 22px;
-      font-weight: 400;
+      font-weight: var(--ch-font-weight-display);
       color: var(--ch-text);
       letter-spacing: 0.01em;
-      line-height: 1.15;
+      line-height: var(--ch-font-leading-display);
     }
 
     /* ── Topbar zone: center ──────────────────────────────────────────
@@ -780,7 +795,7 @@
       margin: 8px 0 0;
       font-family: var(--ch-font-display);
       font-size: 18px;
-      font-weight: 400;
+      font-weight: var(--ch-font-weight-display);
       color: var(--ch-text);
       letter-spacing: 0.01em;
     }
@@ -862,6 +877,7 @@
 
     .dashboard-tile-value {
       font-family: var(--ch-font-display);
+      font-weight: var(--ch-font-weight-display);
       font-size: 24px;
       color: var(--ch-text);
       line-height: 1.1;
@@ -907,6 +923,10 @@
       <label>
         Palette
         <select id="paletteSelect" name="palette" aria-label="Palette"></select>
+
+      <label>
+        Font style
+        <select id="fontStyleSelect" name="fontStyle" aria-label="Font style"></select>
       </label>
 
       <label class="checkbox">
@@ -981,21 +1001,29 @@
         <strong>Three-zone topbar slots.</strong> The topbar grid (<code>auto 1fr auto</code>) exposes three zones: <code>.scaffold-topbar-left</code> (page title + optional sub-title), <code>.scaffold-topbar-center</code> (app context — breadcrumbs, project picker, filters), and <code>.scaffold-topbar-right</code> (app quick-actions + app status + shell theme + shell clock). Empty app slots collapse via <code>:empty</code> and render nothing. Apps fill the slots; the shell never injects fake placeholder UI.
 
         <br /><br />
-        <strong>Typography token contract (font-style axis is planned, not yet implemented).</strong> The shell exposes three semantic font tokens — <code>--ch-font-display</code>, <code>--ch-font-ui</code>, <code>--ch-font-mono</code> — emitted by <code>resolveEdgeMeltVariables()</code>. The preview consumes these via <code>font-family: var(--ch-font-X)</code> instead of hardcoding font names. Defaults today: <code>'Instrument Serif' / 'DM Sans' / 'JetBrains Mono'</code> with system fallbacks, matching what the shell rendered before tokenization. <em>Visual output is unchanged.</em>
+        <strong>Typography token contract (implemented).</strong> The shell exposes three semantic font tokens — <code>--ch-font-display</code>, <code>--ch-font-ui</code>, <code>--ch-font-mono</code> — emitted by <code>resolveEdgeMeltVariables()</code>. Consumer component CSS references these via <code>font-family: var(--ch-font-X)</code>. Defaults: <code>'Instrument Serif' / 'DM Sans' / 'JetBrains Mono'</code>.
 
         <br /><br />
-        These font tokens are the contract for a future <strong>orthogonal typography axis</strong>, planned for a follow-up PR. The design intent is:
-        <pre style="margin: 8px 0 4px; padding: 10px; background: color-mix(in srgb, var(--ch-surface) 60%, transparent); border-radius: 6px; font-size: 11px; line-height: 1.45;">&lt;body data-app-theme="forge" data-font-style="lofi"&gt;</pre>
-        where <code>data-app-theme</code> controls color / surfaces / accents and <code>data-font-style</code> controls typography mood — the two axes are independent so an app can mix any palette with any typography preset. Planned font-style modes (final font choices TBD):
-        <ul style="margin: 6px 0 0 18px; padding: 0; font-size: 11px; line-height: 1.55;">
-          <li><code>default</code> — current toolkit stacks</li>
-          <li><code>technical</code> — sharper, more system-feeling (candidates: Source Serif 4 / Manrope / IBM Plex Mono)</li>
-          <li><code>lofi</code> — softer, editorial (candidates: Cormorant Garamond / Nunito Sans / IBM Plex Mono)</li>
+        The <strong>orthogonal typography axis</strong> (<code>data-font-style</code>) is fully implemented. It is independent of the color palette — any palette can be mixed with any font style. The axis controls weight, leading, and tracking across three semantic roles (display, ui, mono). Font families do not change between modes.
+        <pre style="margin: 8px 0 4px; padding: 10px; background: color-mix(in srgb, var(--ch-surface) 60%, transparent); border-radius: 6px; font-size: 11px; line-height: 1.45;">&lt;body data-app-theme="forge" data-font-style="vanity"&gt;</pre>
+        <strong>10 modes shipped</strong> (use the Font style picker above to preview):
+        <ul style="margin: 6px 0 0 18px; padding: 0; font-size: 11px; line-height: 1.7;">
+          <li><code>default</code> — Chamber-19 standard. Calm, engineering-grade.</li>
+          <li><code>technical</code> — Tighter leading, heavier weight, wider tracking for tabular data.</li>
+          <li><code>lofi</code> — Lighter weight, generous leading for documentation reads.</li>
+          <li><code>blueprint</code> — Stamped not typeset. Tight tracking, heavy mono, minimal leading.</li>
+          <li><code>dense</code> — Dashboard/data mode. Minimum leading, condensed weight, zero tracking.</li>
+          <li><code>typewriter</code> — Mono-forward rhythm. All leading inflated to match mono cadence.</li>
+          <li><code>petal</code> — Featherlight, maximum air. Perfume-brand softness.</li>
+          <li><code>vanity</code> — Magazine-masthead contrast. Heavy headline, ultralight body.</li>
+          <li><code>cream</code> — No drama, pure warmth. Linen tablecloth on a Sunday.</li>
+          <li><code>whimsy</code> — Floaty headlines, precise data. Wide-spaced display, crisp mono.</li>
         </ul>
-        <strong>Status:</strong> <code>data-font-style</code> behavior is NOT implemented. No <code>[data-font-style="..."]</code> rules exist. Weight / leading / tracking tokens are not yet emitted — those will land alongside the actual font-style mode implementation. This PR establishes the family-token contract only so the future axis has clean plumbing.
+        <strong>Status: implemented.</strong> <code>TOOLKIT_FONT_STYLE_MODES</code> defines all 10 modes. <code>resolveFontStyleTokens()</code> emits <code>--ch-font-weight-*</code>, <code>--ch-font-leading-*</code>, and <code>--ch-font-tracking-*</code> tokens. <code>applyToolkitThemeVariables()</code> sets them on <code>documentElement</code> and writes <code>data-font-style</code>. The toolkit's <code>theme.css</code> provides <code>:root</code> defaults and all 10 <code>[data-font-style]</code> CSS-only override blocks. All component CSS files (<code>activation.css</code>, <code>updater.css</code>, <code>ReleaseNotes.css</code>, <code>UpdateModal.css</code>) reference the tokens.
+        <strong>Status: implemented.</strong> <code>TOOLKIT_FONT_STYLE_MODES</code> defines three modes (Default / Technical / Lo-fi) with weight, leading, and tracking values. <code>resolveFontStyleTokens()</code> emits <code>--ch-font-weight-*</code>, <code>--ch-font-leading-*</code>, and <code>--ch-font-tracking-*</code> tokens. <code>applyToolkitThemeVariables()</code> sets them on <code>documentElement</code> and writes <code>data-font-style</code>. The toolkit's <code>theme.css</code> provides <code>:root</code> defaults and <code>[data-font-style]</code> CSS-only overrides. All component CSS files (<code>activation.css</code>, <code>updater.css</code>, <code>ReleaseNotes.css</code>, <code>UpdateModal.css</code>) now reference the tokens.
 
         <br /><br />
-        <strong>Toolkit shell CSS (out of scope this PR):</strong> <code>activation.css</code>, <code>updater.css</code>, <code>ReleaseNotes.css</code>, and <code>splash.css</code> still carry hardcoded font-family declarations (legacy Inter usage in splash/updater). Their tokenization is queued as a separate typography sweep — touching them now would broaden scope beyond what this PR was scoped to.
+        <strong>Toolkit shell CSS:</strong> <code>activation.css</code>, <code>updater.css</code>, <code>ReleaseNotes.css</code>, and <code>UpdateModal.css</code> now reference weight, leading, and tracking tokens. Splash CSS (<code>splash.css</code>) had its Inter fallback corrected to DM Sans; its animation-specific structure means weight/leading/tracking tokens have no visual effect there and were intentionally left out of scope.
       </div>
     </section>
 
@@ -1181,23 +1209,54 @@
       }
     ];
 
+    const FONT_STYLE_MODES = [
+      { id: 'default',   label: 'Default',     description: 'Chamber-19 standard. Calm, engineering-grade.',
+        weight: { display: 400, ui: 400, mono: 400 }, leading: { display: 1.25, ui: 1.5,  mono: 1.45 }, tracking: { display: '0.01em', ui: '0',      mono: '0' } },
+      { id: 'technical', label: 'Technical',   description: 'Tighter leading, heavier weight, wider tracking for tabular data.',
+        weight: { display: 600, ui: 500, mono: 500 }, leading: { display: 1.2,  ui: 1.45, mono: 1.4  }, tracking: { display: '0.02em', ui: '0.01em', mono: '0.02em' } },
+      { id: 'lofi',      label: 'Lo-fi',       description: 'Lighter weight, generous leading for documentation reads.',
+        weight: { display: 400, ui: 300, mono: 400 }, leading: { display: 1.3,  ui: 1.6,  mono: 1.5  }, tracking: { display: '0.02em', ui: '0.02em', mono: '0' } },
+      { id: 'blueprint', label: 'Blueprint',   description: 'Stamped not typeset. Tight tracking, heavy mono, minimal leading.',
+        weight: { display: 500, ui: 400, mono: 600 }, leading: { display: 1.15, ui: 1.35, mono: 1.3  }, tracking: { display: '-0.01em', ui: '0',     mono: '-0.01em' } },
+      { id: 'dense',     label: 'Dense',       description: 'Dashboard/data mode. Minimum leading, condensed weight, zero tracking.',
+        weight: { display: 500, ui: 500, mono: 500 }, leading: { display: 1.1,  ui: 1.15, mono: 1.1  }, tracking: { display: '0',      ui: '0',      mono: '0' } },
+      { id: 'typewriter',label: 'Typewriter',  description: 'Mono-forward rhythm. All leading inflated to match mono cadence.',
+        weight: { display: 400, ui: 300, mono: 400 }, leading: { display: 1.6,  ui: 1.65, mono: 1.6  }, tracking: { display: '0.01em', ui: '0.01em', mono: '0' } },
+      { id: 'petal',     label: 'Petal',       description: 'Featherlight, maximum air. Perfume-brand softness.',
+        weight: { display: 300, ui: 300, mono: 300 }, leading: { display: 1.45, ui: 1.7,  mono: 1.6  }, tracking: { display: '0.04em', ui: '0.025em',mono: '0.01em' } },
+      { id: 'vanity',    label: 'Vanity',      description: 'Magazine-masthead contrast. Heavy headline, ultralight body.',
+        weight: { display: 600, ui: 300, mono: 400 }, leading: { display: 1.1,  ui: 1.75, mono: 1.5  }, tracking: { display: '0.06em', ui: '0.03em', mono: '0' } },
+      { id: 'cream',     label: 'Cream',       description: 'No drama, pure warmth. Linen tablecloth on a Sunday.',
+        weight: { display: 400, ui: 400, mono: 400 }, leading: { display: 1.45, ui: 1.8,  mono: 1.65 }, tracking: { display: '0.03em', ui: '0.03em', mono: '0.01em' } },
+      { id: 'whimsy',    label: 'Whimsy',      description: 'Floaty headlines, precise data. Wide-spaced display, crisp mono.',
+        weight: { display: 300, ui: 300, mono: 500 }, leading: { display: 1.35, ui: 1.6,  mono: 1.4  }, tracking: { display: '0.08em', ui: '0.015em',mono: '-0.01em' } },
+    ];
+
     const COLOR_KEYS = ['bg','surface','text','muted','accent','accentText','border','success','warning','error','info'];
     const state = {
       paletteId: PALETTES[0].id,
+      fontStyleMode: FONT_STYLE_MODES[0].id,
       useCustomColors: false,
       customColors: { ...PALETTES[0].colors }
     };
-
     const paletteSelect = document.getElementById('paletteSelect');
     const customToggle = document.getElementById('customToggle');
     const customEditor = document.getElementById('customEditor');
     const activePalette = document.getElementById('activePalette');
+    const fontStyleSelect = document.getElementById('fontStyleSelect');
 
     for (const palette of PALETTES) {
       const option = document.createElement('option');
       option.value = palette.id;
       option.textContent = palette.name;
       paletteSelect.appendChild(option);
+    }
+
+    for (const mode of FONT_STYLE_MODES) {
+      const option = document.createElement('option');
+      option.value = mode.id;
+      option.textContent = mode.label;
+      fontStyleSelect.appendChild(option);
     }
 
     function getActivePalette() {
@@ -1302,6 +1361,21 @@
       };
     }
 
+    function resolveFontStyleTokens() {
+      const mode = FONT_STYLE_MODES.find((m) => m.id === state.fontStyleMode) || FONT_STYLE_MODES[0];
+      return {
+        '--ch-font-weight-display': String(mode.weight.display),
+        '--ch-font-weight-ui': String(mode.weight.ui),
+        '--ch-font-weight-mono': String(mode.weight.mono),
+        '--ch-font-leading-display': String(mode.leading.display),
+        '--ch-font-leading-ui': String(mode.leading.ui),
+        '--ch-font-leading-mono': String(mode.leading.mono),
+        '--ch-font-tracking-display': mode.tracking.display,
+        '--ch-font-tracking-ui': mode.tracking.ui,
+        '--ch-font-tracking-mono': mode.tracking.mono,
+      };
+    }
+
     function applyColors() {
       const colors = resolveColors();
       for (const key of COLOR_KEYS) {
@@ -1311,6 +1385,11 @@
       // Edge-melt variables re-derive whenever the palette changes.
       const edgeMelt = resolveEdgeMeltVariables(colors);
       for (const [name, value] of Object.entries(edgeMelt)) {
+        document.documentElement.style.setProperty(name, value);
+      }
+
+      const fontTokens = resolveFontStyleTokens();
+      for (const [name, value] of Object.entries(fontTokens)) {
         document.documentElement.style.setProperty(name, value);
       }
 
@@ -1381,6 +1460,11 @@
       buildCustomEditor();
     });
 
+    fontStyleSelect.addEventListener('change', (event) => {
+      state.fontStyleMode = event.target.value;
+      applyColors();
+    });
+
     customToggle.addEventListener('change', (event) => {
       state.useCustomColors = event.target.checked;
       customEditor.hidden = !state.useCustomColors;
@@ -1389,6 +1473,7 @@
     });
 
     paletteSelect.value = state.paletteId;
+    fontStyleSelect.value = state.fontStyleMode;
     customToggle.checked = state.useCustomColors;
     customEditor.hidden = !state.useCustomColors;
     applyColors();
