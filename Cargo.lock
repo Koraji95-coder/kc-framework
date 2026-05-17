@@ -640,6 +640,7 @@ dependencies = [
  "serde_json",
  "sha2 0.11.0",
  "tauri",
+ "thiserror 1.0.69",
 ]
 
 [[package]]

@@ -18,6 +18,7 @@
 // No ${TOOL_*} placeholders — all tool-specific values are passed at runtime.
 
 pub mod activation;
+pub mod ai;
 pub mod log;
 pub mod sidecar;
 pub mod splash;

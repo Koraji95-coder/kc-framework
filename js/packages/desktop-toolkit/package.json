@@ -14,7 +14,11 @@
     "./components/ReleaseNotes": "./src/components/ReleaseNotes/ReleaseNotes.jsx",
     "./theme": "./src/theme/index.js",
     "./utils/version": "./src/utils/version.js",
-    "./window/showOnReady": "./src/window/showOnReady.jsx"
+    "./window/showOnReady": "./src/window/showOnReady.jsx",
+    "./ai": "./src/ai/index.js",
+    "./ai/ChatPanel": "./src/ai/ChatPanel.jsx",
+    "./ai/useAIChat": "./src/ai/useAIChat.js",
+    "./ai/useLanes": "./src/ai/useLanes.js"
   },
   "bin": {
     "desktop-toolkit-sync-installer-assets": "./build-scripts/sync-installer-assets.mjs"

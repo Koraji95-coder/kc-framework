@@ -1,0 +1,146 @@
+/* ChatPanel.css — streaming chat panel for desktop-toolkit/ai.
+   Consumers must wrap with ToolkitThemeProvider so --ch-* tokens resolve. */
+
+.ch-chat-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--ch-surface);
+  border: 1px solid var(--ch-border);
+  border-radius: 8px;
+  font-family: var(--ch-font-ui);
+  font-weight: var(--ch-font-weight-ui);
+  line-height: var(--ch-font-leading-ui);
+  letter-spacing: var(--ch-font-tracking-ui);
+  color: var(--ch-text);
+}
+
+.ch-chat-messages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ch-chat-empty {
+  margin: auto;
+  color: var(--ch-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.ch-chat-message {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: rgb(255 255 255 / 0.02);
+  border: 1px solid var(--ch-border);
+}
+
+.ch-chat-message-user {
+  background: rgb(from var(--ch-accent) r g b / 0.06);
+  border-color: rgb(from var(--ch-accent) r g b / 0.20);
+}
+
+.ch-chat-message-assistant {
+  background: rgb(255 255 255 / 0.03);
+}
+
+.ch-chat-role {
+  font-family: var(--ch-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ch-accent);
+}
+
+.ch-chat-content {
+  font-size: 14px;
+  line-height: var(--ch-font-leading-ui);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.ch-chat-error {
+  padding: 8px 12px;
+  background: rgb(from var(--ch-error) r g b / 0.10);
+  color: var(--ch-error);
+  font-family: var(--ch-font-mono);
+  font-size: 11px;
+  border-top: 1px solid var(--ch-border);
+}
+
+.ch-chat-meta {
+  padding: 6px 12px;
+  font-family: var(--ch-font-mono);
+  font-size: 10px;
+  color: var(--ch-muted);
+  letter-spacing: 0.04em;
+  border-top: 1px solid var(--ch-border);
+}
+
+.ch-chat-input-row {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid var(--ch-border);
+}
+
+.ch-chat-input {
+  flex: 1;
+  background: rgb(255 255 255 / 0.04);
+  border: 1px solid var(--ch-border);
+  border-radius: 4px;
+  padding: 9px 12px;
+  color: var(--ch-text);
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.ch-chat-input:focus {
+  border-color: var(--ch-accent);
+}
+
+.ch-chat-input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.ch-chat-send {
+  background: var(--ch-accent);
+  color: var(--ch-accent-text);
+  border: none;
+  border-radius: 4px;
+  padding: 9px 16px;
+  font-family: inherit;
+  font-weight: var(--ch-font-weight-ui);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.ch-chat-send:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.ch-chat-send:hover:not(:disabled) {
+  background: var(--ch-info);
+}
+
+.ch-chat-cancel {
+  background: var(--ch-warning);
+}
+
+.ch-chat-cancel:hover {
+  background: var(--ch-error);
+}
