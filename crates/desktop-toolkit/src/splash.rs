@@ -171,6 +171,23 @@ pub fn emit_status(app: &AppHandle, phase: &str, message: &str, kind: StatusKind
     }
 }
 
+/// Emit a Pending then Ok status for a step that completes synchronously.
+///
+/// Convenience wrapper that collapses the common consumer-side pattern:
+///
+/// ```ignore
+/// splash::emit_status(&app, key, msg, splash::StatusKind::Pending);
+/// splash::emit_status(&app, key, msg, splash::StatusKind::Ok);
+/// ```
+///
+/// into a single call. Use this for informational steps where there is no
+/// real work to perform between the Pending and Ok emissions (e.g. status
+/// lines that are deferred to React, or no-op pre-checks).
+pub fn emit_status_step(app: &AppHandle, phase: &str, message: &str) {
+    emit_status(app, phase, message, StatusKind::Pending);
+    emit_status(app, phase, message, StatusKind::Ok);
+}
+
 /// Close the splash window. Silently ignores errors (e.g. already closed).
 pub fn close_splash(app: &AppHandle) {
     if let Some(win) = app.get_webview_window("splash") {
@@ -178,4 +195,42 @@ pub fn close_splash(app: &AppHandle) {
             eprintln!("[splash] close_splash failed: {e}");
         }
     }
+}
+
+/// Cross-fade from the splash to the main window.
+///
+/// Emits `splash://fade-now` so the splash JS holds the success state for
+/// `fade_hold_ms`, then cross-fades the whole splash root to opacity 0 over
+/// `fade_duration_ms`. The splash frontend invokes `splash_fade_complete`
+/// from `transitionend`, which shows the main window and closes the splash
+/// atomically.
+///
+/// As a safety net (in case the frontend never invokes the command -- e.g.
+/// JS error, window minimised mid-fade), this function sleeps for the
+/// expected hold + fade + safety duration and then performs the same
+/// show / close from Rust. Both paths are idempotent.
+///
+/// **Must be called from a background thread** -- it blocks for
+/// `fade_hold_ms + fade_duration_ms + fade_safety_ms` total.
+pub fn transition_to_main_window(
+    app: &AppHandle,
+    fade_hold_ms: u64,
+    fade_duration_ms: u64,
+    fade_safety_ms: u64,
+) {
+    if let Err(e) = app.emit("splash://fade-now", ()) {
+        eprintln!("[splash] emit splash://fade-now failed: {e}");
+    }
+
+    std::thread::sleep(std::time::Duration::from_millis(
+        fade_hold_ms + fade_duration_ms + fade_safety_ms,
+    ));
+
+    let app_for_ui = app.clone();
+    let _ = app.run_on_main_thread(move || {
+        if let Some(main_win) = app_for_ui.get_webview_window("main") {
+            let _ = main_win.show();
+        }
+        close_splash(&app_for_ui);
+    });
 }

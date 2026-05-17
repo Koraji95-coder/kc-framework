@@ -86,6 +86,30 @@ pub fn get_update_path() -> PathBuf {
         })
 }
 
+/// Set the default update path env var if it is not already set in the
+/// environment.
+///
+/// Must be called **before** `tauri::Builder::default()` -- this function
+/// uses `std::env::set_var` which is `unsafe` in Rust 1.81+ when the program
+/// is multi-threaded. Call this from `pub fn run()` before any tauri::Builder
+/// invocation so the process is still single-threaded when the write happens.
+///
+/// Centralises the `unsafe` block so every consumer does not have to repeat
+/// it. Honors any externally-set value: if the env var is already populated
+/// (e.g. by an integration test or a launcher), this function is a no-op.
+pub fn set_default_update_path(default_path: &str) {
+    if std::env::var(UPDATE_PATH_ENV_VAR).is_ok() {
+        return;
+    }
+    #[allow(unsafe_code)]
+    // SAFETY: callers contract this function to run before any thread
+    // creation (i.e. before tauri::Builder::default()), so std::env::set_var
+    // is sound on Rust >= 1.81.
+    unsafe {
+        std::env::set_var(UPDATE_PATH_ENV_VAR, default_path);
+    }
+}
+
 // ── Logging ───────────────────────────────────────────────────────────────
 
 /// Write a timestamped log line to `%LOCALAPPDATA%\<log_dir>\updater.log`.
