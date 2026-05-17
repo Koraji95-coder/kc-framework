@@ -16,7 +16,7 @@
 
 use std::fs;
 use std::io::{Read, Write};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use semver::Version;
 use serde::Deserialize;
@@ -163,7 +163,7 @@ pub fn check_for_update(current_version: &str, log_dir: &str) -> UpdateCheckResu
 /// Copy the installer from the shared drive to `%TEMP%\<installer-name>`,
 /// emitting `update_progress` events to the Tauri frontend as bytes are copied.
 pub fn copy_installer_with_progress(
-    update_path: &PathBuf,
+    update_path: &Path,
     installer_name: &str,
     log_dir: &str,
     app: &AppHandle,

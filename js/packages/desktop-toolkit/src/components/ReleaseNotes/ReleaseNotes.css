@@ -9,7 +9,7 @@
  */
 
 .release-notes {
-  font-family: 'DM Sans', system-ui, sans-serif;
+  font-family: var(--ch-font-ui, 'DM Sans', system-ui, sans-serif);
   font-size: 0.875rem;
   line-height: 1.6;
   color: #a89070;
@@ -20,7 +20,7 @@
 
 .release-notes h1,
 .release-notes h2 {
-  font-family: 'Instrument Serif', Georgia, serif;
+  font-family: var(--ch-font-display, 'Instrument Serif', Georgia, serif);
   font-weight: 400;
   color: #f0dcc0;
   margin: 0.9rem 0 0.35rem;
@@ -34,7 +34,7 @@
 .release-notes h4,
 .release-notes h5,
 .release-notes h6 {
-  font-family: 'DM Sans', system-ui, sans-serif;
+  font-family: var(--ch-font-ui, 'DM Sans', system-ui, sans-serif);
   font-weight: 600;
   color: #d4b888;
   margin: 0.75rem 0 0.3rem;
@@ -43,6 +43,7 @@
 
 .release-notes h3 { font-size: 0.9rem; }
 .release-notes h4 { font-size: 0.85rem; }
+
 .release-notes h5,
 .release-notes h6 { font-size: 0.8rem; }
 
@@ -88,10 +89,10 @@
 /* ── Inline code ─────────────────────────────────────────────────────── */
 
 .release-notes code {
-  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+  font-family: var(--ch-font-mono, 'JetBrains Mono', 'Fira Code', ui-monospace, monospace);
   font-size: 0.8em;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgb(255 255 255 / 0.08);
+  border: 1px solid rgb(255 255 255 / 0.06);
   border-radius: 3px;
   padding: 0.1em 0.35em;
   color: #c8c0b0;
@@ -100,8 +101,8 @@
 /* ── Code blocks ─────────────────────────────────────────────────────── */
 
 .release-notes pre {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgb(255 255 255 / 0.05);
+  border: 1px solid rgb(255 255 255 / 0.06);
   border-radius: 4px;
   padding: 0.65rem 0.9rem;
   overflow-x: auto;
@@ -134,7 +135,7 @@
 
 .release-notes hr {
   border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgb(255 255 255 / 0.08);
   margin: 0.75rem 0;
 }
 
@@ -152,7 +153,7 @@
 /* ── Fallback message ─────────────────────────────────────────────────── */
 
 .release-notes-fallback {
-  font-family: 'DM Sans', system-ui, sans-serif;
+  font-family: var(--ch-font-ui, 'DM Sans', system-ui, sans-serif);
   font-size: 0.875rem;
   color: #a89070;
   margin: 0;
