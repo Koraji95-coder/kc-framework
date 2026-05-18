@@ -629,7 +629,7 @@ dependencies = [
 
 [[package]]
 name = "desktop-toolkit"
-version = "2.7.1"
+version = "2.7.3"
 dependencies = [
  "base64 0.22.1",
  "digest 0.11.3",
