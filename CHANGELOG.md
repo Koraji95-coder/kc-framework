@@ -6,6 +6,28 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [2.7.1] - 2026-05-17
+
+### Added
+
+- **Dashboard time-window picker** -- `<DashboardOverview>` gains a
+  segmented `1h / 24h / 7d / 30d / all` selector in the header that drives
+  the broker's `/api/usage/summary?from=...&to=...` query. Default is
+  `24h`; override via the new `defaultWindow` prop. The hook accepts a
+  `window` option for the same behavior in custom UIs.
+- **Per-lane cost surface** -- each lane row in the dashboard now shows
+  cost (primary), request count, and input/output token totals together,
+  sorted by cost descending so the most expensive lanes surface first.
+  Lanes with no usage data drop to the bottom in their original order.
+- **`formatTokens()` helper** -- renders large token counts as `1.2k` /
+  `3.4M` for readable lane stats.
+
+### Changed
+
+- StatGrid request/cost labels are now dynamic to match the selected
+  window (`Requests (24h)` / `Requests (7d)` / `Requests (lifetime)`).
+
+
 ## [2.7.0] - 2026-05-17
 
 ### Added

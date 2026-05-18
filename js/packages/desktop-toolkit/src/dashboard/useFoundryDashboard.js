@@ -16,6 +16,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
  * @param {number} [options.pollIntervalMs=5000]
  *   How often to refetch. Default 5s. Pass 0 to disable polling (fetch once
  *   on mount only).
+ * @param {("1h"|"24h"|"7d"|"30d"|"all")} [options.window="24h"]
+ *   Time window for /api/usage/summary aggregates. "all" omits the from/to
+ *   filter and asks the broker for the full lifetime summary.
  * @param {{ lanes?: string[], apps?: string[] }} [options.filter]
  *   Optional narrowing. Currently only `lanes` is honored -- restricts the
  *   returned lane list to those names. `apps` is reserved for the future
@@ -44,6 +47,7 @@ export function useFoundryDashboard({
   brokerUrl,
   apiKey,
   pollIntervalMs = 5000,
+  window: timeWindow = "24h",
   filter,
 } = {}) {
   const [data, setData] = useState(null);
@@ -71,7 +75,7 @@ export function useFoundryDashboard({
           ? fetch(`${base}/api/lanes`, { headers: lanesHeaders })
           : Promise.resolve(null),
         fetch(`${base}/api/metrics`),
-        fetch(`${base}/api/usage/summary`),
+        fetch(`${base}/api/usage/summary${windowToQuery(timeWindow)}`),
         fetch(`${base}/api/providers`),
       ]);
 
@@ -106,7 +110,7 @@ export function useFoundryDashboard({
         setIsLoading(false);
       }
     }
-  }, [brokerUrl, apiKey, filter?.lanes]);
+  }, [brokerUrl, apiKey, timeWindow, filter?.lanes]);
 
   useEffect(() => {
     cancelledRef.current = false;
@@ -128,4 +132,23 @@ export function useFoundryDashboard({
   }, [fetchAll, pollIntervalMs]);
 
   return { data, isLoading, error, refresh: fetchAll, lastUpdated };
+}
+
+// -- Helpers -------------------------------------------------------------
+
+/**
+ * Translate a friendly window label into a `?from=...&to=...` query string
+ * matching the broker's /api/usage/summary contract. "all" returns an
+ * empty string so the broker's lifetime aggregation is used.
+ */
+function windowToQuery(window) {
+  if (!window || window === "all") return "";
+  const now = new Date();
+  const hoursMap = { "1h": 1, "24h": 24, "7d": 24 * 7, "30d": 24 * 30 };
+  const hours = hoursMap[window];
+  if (!hours) return "";
+  const from = new Date(now.getTime() - hours * 60 * 60 * 1000);
+  // The broker accepts ISO-8601 instants; trim ms for cleaner URLs.
+  const isoTrim = (d) => d.toISOString().replace(/\.\d{3}Z$/, "Z");
+  return `?from=${encodeURIComponent(isoTrim(from))}&to=${encodeURIComponent(isoTrim(now))}`;
 }
