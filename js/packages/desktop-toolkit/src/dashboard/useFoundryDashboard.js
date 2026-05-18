@@ -66,17 +66,23 @@ export function useFoundryDashboard({
     }
 
     const base = brokerUrl.replace(/\/$/, "");
-    const lanesHeaders = apiKey ? { "X-Foundry-Api-Key": apiKey } : {};
+    // The broker's LaneAuthMiddleware gates /api/lanes, /api/metrics,
+    // /api/providers, /api/usage/* (and /api/chat/*) all behind the same
+    // X-Foundry-Api-Key header. Pass it to every dashboard endpoint when
+    // present -- otherwise three of the four fetches 401 in production and
+    // the dashboard renders with empty stat cards.
+    const authHeaders = apiKey ? { "X-Foundry-Api-Key": apiKey } : {};
+    const authInit = apiKey ? { headers: authHeaders } : undefined;
 
     try {
       const [lanesRes, metricsRes, usageRes, providersRes] = await Promise.all([
         // /api/lanes is auth-gated; if no key is provided, skip it gracefully.
         apiKey
-          ? fetch(`${base}/api/lanes`, { headers: lanesHeaders })
+          ? fetch(`${base}/api/lanes`, authInit)
           : Promise.resolve(null),
-        fetch(`${base}/api/metrics`),
-        fetch(`${base}/api/usage/summary${windowToQuery(timeWindow)}`),
-        fetch(`${base}/api/providers`),
+        fetch(`${base}/api/metrics`, authInit),
+        fetch(`${base}/api/usage/summary${windowToQuery(timeWindow)}`, authInit),
+        fetch(`${base}/api/providers`, authInit),
       ]);
 
       const lanesBody = lanesRes?.ok ? await lanesRes.json() : { lanes: [], identity: null };

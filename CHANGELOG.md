@@ -6,6 +6,21 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [2.7.2] - 2026-05-17
+
+### Fixed
+
+- **`useFoundryDashboard` now sends the API key to every protected
+  broker endpoint, not just `/api/lanes`.** The broker's
+  `LaneAuthMiddleware` gates `/api/lanes`, `/api/metrics`,
+  `/api/providers`, and `/api/usage/*` behind the same
+  `X-Foundry-Api-Key` header. Before this fix, the hook only passed
+  the key to `/api/lanes`, so the other three fetches returned 401
+  in production and the dashboard rendered with empty stat cards and
+  empty provider/usage lists. Surfaced during the Tier 4 E2E smoke
+  pre-flight.
+
+
 ## [2.7.1] - 2026-05-17
 
 ### Added
