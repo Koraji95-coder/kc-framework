@@ -244,3 +244,50 @@
 .ch-dash-dot-amber   { background: #f59e0b; }
 .ch-dash-dot-red     { background: #ef4444; }
 .ch-dash-dot-cyan    { background: #06b6d4; }
+/* -- TimeWindowPicker (segmented control) ------------------------------ */
+
+.ch-dash-window {
+  display: inline-flex;
+  border: 1px solid #27272a;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #18181b;
+}
+
+.ch-dash-window-btn {
+  background: transparent;
+  border: none;
+  color: #a1a1aa;
+  padding: 4px 10px;
+  font-family: var(--ch-mono, ui-monospace, monospace);
+  font-size: 11px;
+  cursor: pointer;
+  border-right: 1px solid #27272a;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.ch-dash-window-btn:last-child {
+  border-right: none;
+}
+
+.ch-dash-window-btn:hover {
+  background: #27272a;
+  color: #e4e4e7;
+}
+
+.ch-dash-window-btn-active {
+  background: #3f3f46;
+  color: #fafafa;
+}
+
+/* -- Lane row stat hierarchy: cost primary, rest secondary ------------- */
+
+.ch-dash-row-stat-primary {
+  font-weight: 600;
+  color: #fafafa;
+}
+
+.ch-dash-row-stat-secondary {
+  color: #71717a;
+  font-size: 11px;
+}

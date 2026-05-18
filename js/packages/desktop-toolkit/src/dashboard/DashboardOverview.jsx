@@ -1,10 +1,12 @@
+import { useState } from "react";
 import { useFoundryDashboard } from "./useFoundryDashboard.js";
 import "./DashboardOverview.css";
 
 /**
  * Drop-in dashboard view for the Foundry broker. Polls every 5s by default;
- * renders broker health, registered lanes, recent usage, and provider
- * reachability in a list/card layout matching the deep-dive aesthetic.
+ * renders broker health, registered lanes (sorted by cost), recent usage,
+ * and provider reachability in a list/card layout matching the deep-dive
+ * aesthetic.
  *
  * Apps that want a custom layout should call `useFoundryDashboard()`
  * directly and compose their own UI from the returned data shape.
@@ -16,6 +18,8 @@ import "./DashboardOverview.css";
  *   Optional `X-Foundry-Api-Key` header. Required to populate the lane list.
  * @param {number} [props.pollIntervalMs=5000]
  *   Refresh interval. 0 = no polling, fetch once on mount only.
+ * @param {("1h"|"24h"|"7d"|"30d"|"all")} [props.defaultWindow="24h"]
+ *   Initial usage time window. Driven through the in-header picker.
  * @param {{ lanes?: string[] }} [props.filter]
  *   Optional narrowing -- show only specific lanes.
  * @param {string} [props.className]
@@ -24,13 +28,17 @@ export function DashboardOverview({
   brokerUrl,
   apiKey,
   pollIntervalMs = 5000,
+  defaultWindow = "24h",
   filter,
   className,
 }) {
+  const [timeWindow, setTimeWindow] = useState(defaultWindow);
+
   const { data, isLoading, error, refresh, lastUpdated } = useFoundryDashboard({
     brokerUrl,
     apiKey,
     pollIntervalMs,
+    window: timeWindow,
     filter,
   });
 
@@ -42,6 +50,8 @@ export function DashboardOverview({
         lastUpdated={lastUpdated}
         onRefresh={refresh}
         isLoading={isLoading}
+        timeWindow={timeWindow}
+        onTimeWindowChange={setTimeWindow}
       />
 
       {error && <div className="ch-dash-error">connection error: {error}</div>}
@@ -50,7 +60,7 @@ export function DashboardOverview({
         <div className="ch-dash-empty">Loading broker state...</div>
       ) : data ? (
         <>
-          <StatGrid metrics={data.metrics} usage={data.usage} lanesCount={data.lanes.length} />
+          <StatGrid metrics={data.metrics} usage={data.usage} lanesCount={data.lanes.length} timeWindow={timeWindow} />
           <LanesPanel lanes={data.lanes} usage={data.usage} />
           <ProvidersPanel providers={data.providers} />
         </>
@@ -59,7 +69,7 @@ export function DashboardOverview({
   );
 }
 
-function Header({ brokerUrl, identity, lastUpdated, onRefresh, isLoading }) {
+function Header({ brokerUrl, identity, lastUpdated, onRefresh, isLoading, timeWindow, onTimeWindowChange }) {
   return (
     <div className="ch-dash-header">
       <div className="ch-dash-header-main">
@@ -68,6 +78,7 @@ function Header({ brokerUrl, identity, lastUpdated, onRefresh, isLoading }) {
         {identity && <span className="ch-dash-identity">as {identity}</span>}
       </div>
       <div className="ch-dash-header-actions">
+        <TimeWindowPicker value={timeWindow} onChange={onTimeWindowChange} />
         {lastUpdated && (
           <span className="ch-dash-stale">
             updated {formatRelative(lastUpdated)}
@@ -86,19 +97,46 @@ function Header({ brokerUrl, identity, lastUpdated, onRefresh, isLoading }) {
   );
 }
 
-function StatGrid({ metrics, usage, lanesCount }) {
+const WINDOW_OPTIONS = [
+  { value: "1h",  label: "1h"  },
+  { value: "24h", label: "24h" },
+  { value: "7d",  label: "7d"  },
+  { value: "30d", label: "30d" },
+  { value: "all", label: "all" },
+];
+
+function TimeWindowPicker({ value, onChange }) {
+  return (
+    <div className="ch-dash-window" role="group" aria-label="Usage time window">
+      {WINDOW_OPTIONS.map((opt) => (
+        <button
+          key={opt.value}
+          type="button"
+          className={opt.value === value ? "ch-dash-window-btn ch-dash-window-btn-active" : "ch-dash-window-btn"}
+          aria-pressed={opt.value === value}
+          onClick={() => onChange && onChange(opt.value)}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function StatGrid({ metrics, usage, lanesCount, timeWindow }) {
   const uptimeSec = metrics?.broker?.uptimeSeconds ?? 0;
   const activeStreams = metrics?.streams?.activeTotal ?? 0;
   const totalRequests = usage?.totalRequests ?? usage?.requestCount ?? 0;
   const totalCost = usage?.totalCost ?? usage?.totalCostUsd ?? 0;
+  const windowLabel = timeWindow === "all" ? "lifetime" : timeWindow;
 
   return (
     <div className="ch-dash-stats">
-      <Stat label="Lanes"           value={lanesCount} />
-      <Stat label="Active streams"  value={activeStreams} dot={activeStreams > 0 ? "emerald" : null} />
-      <Stat label="Requests (24h)"  value={totalRequests.toLocaleString()} />
-      <Stat label="Cost (24h)"      value={formatCost(totalCost)} />
-      <Stat label="Uptime"          value={formatUptime(uptimeSec)} />
+      <Stat label="Lanes"                                value={lanesCount} />
+      <Stat label="Active streams"                       value={activeStreams} dot={activeStreams > 0 ? "emerald" : null} />
+      <Stat label={`Requests (${windowLabel})`}          value={totalRequests.toLocaleString()} />
+      <Stat label={`Cost (${windowLabel})`}              value={formatCost(totalCost)} />
+      <Stat label="Uptime"                               value={formatUptime(uptimeSec)} />
     </div>
   );
 }
@@ -124,18 +162,34 @@ function LanesPanel({ lanes, usage }) {
     );
   }
 
-  // usage.byLane is the summary breakdown when available
+  // Normalize the LaneSummaryRow / UsageAggregate shapes the broker returns
+  // into a single per-lane stat row keyed by lane name.
   const usageByLane = new Map();
   if (Array.isArray(usage?.byLane)) {
     for (const row of usage.byLane) {
-      usageByLane.set(row.lane ?? row.Lane, row);
+      const lane = row.lane ?? row.Lane ?? row.key;
+      if (!lane) continue;
+      usageByLane.set(lane, {
+        requests:     row.requestCount      ?? row.requests     ?? 0,
+        cost:         row.totalCostUsd      ?? row.costUsd      ?? 0,
+        inputTokens:  row.totalInputTokens  ?? row.inputTokens  ?? 0,
+        outputTokens: row.totalOutputTokens ?? row.outputTokens ?? 0,
+      });
     }
   }
+
+  // Sort by cost descending so the most expensive lanes surface first;
+  // lanes with no usage fall to the bottom in their original order.
+  const sortedLanes = [...lanes].sort((a, b) => {
+    const ua = usageByLane.get(a.name);
+    const ub = usageByLane.get(b.name);
+    return (ub?.cost ?? -1) - (ua?.cost ?? -1);
+  });
 
   return (
     <Panel title="Lanes">
       <ul className="ch-dash-list">
-        {lanes.map((lane) => {
+        {sortedLanes.map((lane) => {
           const u = usageByLane.get(lane.name);
           return (
             <li key={lane.name} className="ch-dash-row">
@@ -154,9 +208,14 @@ function LanesPanel({ lanes, usage }) {
               </div>
               {u && (
                 <div className="ch-dash-row-stats">
-                  <span>{u.requestCount ?? u.requests ?? 0} req</span>
-                  {(u.totalCost ?? u.totalCostUsd) > 0 && (
-                    <span>{formatCost(u.totalCost ?? u.totalCostUsd)}</span>
+                  <span className="ch-dash-row-stat-primary">{formatCost(u.cost)}</span>
+                  <span className="ch-dash-row-stat-secondary">
+                    {u.requests.toLocaleString()} req
+                  </span>
+                  {(u.inputTokens > 0 || u.outputTokens > 0) && (
+                    <span className="ch-dash-row-stat-secondary">
+                      {formatTokens(u.inputTokens)} in / {formatTokens(u.outputTokens)} out
+                    </span>
                   )}
                 </div>
               )}
@@ -212,6 +271,13 @@ function formatCost(cost) {
   if (cost < 0.01) return `$${cost.toFixed(4)}`;
   if (cost < 1) return `$${cost.toFixed(3)}`;
   return `$${cost.toFixed(2)}`;
+}
+
+function formatTokens(n) {
+  if (typeof n !== "number" || Number.isNaN(n) || n <= 0) return "0";
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000)     return `${(n / 1_000).toFixed(1)}k`;
+  return n.toLocaleString();
 }
 
 function formatUptime(seconds) {
