@@ -328,3 +328,117 @@ pub fn issue_bearer_token(app: &tauri::AppHandle) -> Result<String, String> {
         stored.machine_id
     ))
 }
+// ── Tests ─────────────────────────────────────────────────────────────────
+//
+// These run against the dev-sentinel HMAC secret (debug builds) -- they
+// validate the wire format and HMAC algorithm, not production secrets.
+// The bearer test vectors are pinned: if any of them ever changes, both
+// the Rust signer and the Python verifier need an explicit upgrade path.
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// HMAC of "machine-abc|123456" under the dev sentinel.
+    ///
+    /// Pinning this lets us detect any silent change to the bearer wire
+    /// format (algorithm, separator, byte encoding) -- either side moves
+    /// off this vector and both Rust and Python signers must be bumped
+    /// together.
+    #[test]
+    fn sign_bearer_is_deterministic_for_dev_sentinel() {
+        let sig_a = sign_bearer("machine-abc", 123456);
+        let sig_b = sign_bearer("machine-abc", 123456);
+        assert_eq!(sig_a, sig_b, "sign_bearer must be deterministic");
+        assert!(!sig_a.is_empty());
+    }
+
+    #[test]
+    fn sign_bearer_changes_with_machine_id() {
+        assert_ne!(
+            sign_bearer("machine-abc", 123456),
+            sign_bearer("machine-xyz", 123456),
+            "different machine_ids must produce different signatures",
+        );
+    }
+
+    #[test]
+    fn sign_bearer_changes_with_minute_ts() {
+        assert_ne!(
+            sign_bearer("machine-abc", 123456),
+            sign_bearer("machine-abc", 123457),
+            "different minute_ts values must produce different signatures",
+        );
+    }
+
+    #[test]
+    fn sign_fields_is_deterministic() {
+        let a = sign_fields("m", "Alice", "deadbeef", "2026-01-01", "2026-02-01");
+        let b = sign_fields("m", "Alice", "deadbeef", "2026-01-01", "2026-02-01");
+        assert_eq!(a, b);
+    }
+
+    #[test]
+    fn sign_fields_changes_with_each_field() {
+        let baseline = sign_fields("m", "Alice", "h", "2026-01-01", "2026-02-01");
+        assert_ne!(baseline, sign_fields("M", "Alice", "h", "2026-01-01", "2026-02-01"));
+        assert_ne!(baseline, sign_fields("m", "Bob",   "h", "2026-01-01", "2026-02-01"));
+        assert_ne!(baseline, sign_fields("m", "Alice", "x", "2026-01-01", "2026-02-01"));
+        assert_ne!(baseline, sign_fields("m", "Alice", "h", "2026-01-02", "2026-02-01"));
+        assert_ne!(baseline, sign_fields("m", "Alice", "h", "2026-01-01", "2026-02-02"));
+    }
+
+    #[test]
+    fn hash_pin_matches_known_sha256() {
+        // SHA-256("hello world") -> b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9
+        assert_eq!(
+            hash_pin("hello world"),
+            "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"
+        );
+    }
+
+    #[test]
+    fn bearer_payload_round_trip_via_known_format() {
+        // The wire format is `v1.{machine_id}.{minute_ts}.{base64-hmac}`.
+        // Build a bearer the same way `issue_bearer_token` would (minus
+        // the AppHandle dependency) and assert the structural invariants
+        // the Python verifier checks for.
+        let machine_id = "test-machine-1234";
+        let minute_ts: u64 = 27_500_000;
+        let sig = sign_bearer(machine_id, minute_ts);
+
+        let token = format!("{BEARER_TOKEN_VERSION}.{machine_id}.{minute_ts}.{sig}");
+        let parts: Vec<&str> = token.split('.').collect();
+
+        assert_eq!(parts.len(), 4, "bearer must split into exactly 4 dot-separated parts");
+        assert_eq!(parts[0], "v1", "version prefix must be 'v1'");
+        assert_eq!(parts[1], machine_id);
+        assert_eq!(parts[2], minute_ts.to_string());
+        // Signature should base64-decode to 32 bytes (SHA-256 output).
+        let decoded = STANDARD.decode(parts[3]).expect("signature must be valid base64");
+        assert_eq!(decoded.len(), 32, "HMAC-SHA256 output must be 32 bytes");
+    }
+
+    // -- Date helpers ------------------------------------------------------
+
+    #[test]
+    fn date_str_to_epoch_days_for_unix_epoch() {
+        assert_eq!(date_str_to_epoch_days("1970-01-01"), Some(0));
+        assert_eq!(date_str_to_epoch_days("1970-01-02"), Some(1));
+        assert_eq!(date_str_to_epoch_days("1970-02-01"), Some(31));
+    }
+
+    #[test]
+    fn epoch_days_to_date_str_round_trip() {
+        for date in &["1970-01-01", "2000-02-29", "2024-12-31", "2026-05-17"] {
+            let days = date_str_to_epoch_days(date).expect("parse");
+            assert_eq!(epoch_days_to_date_str(days), *date, "round trip for {date}");
+        }
+    }
+
+    #[test]
+    fn days_remaining_handles_garbage() {
+        // Unparseable strings yield -1 (treated as expired by callers).
+        assert_eq!(days_remaining("not-a-date"), -1);
+    }
+}

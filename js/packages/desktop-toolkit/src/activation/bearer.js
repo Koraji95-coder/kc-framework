@@ -31,6 +31,9 @@
 
 import { useCallback } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { buildBearerInit } from "./bearer-helpers.js";
+
+export { buildBearerInit };
 
 /**
  * Fetch a fresh bearer token from the toolkit.  Resolves with the raw token
@@ -56,17 +59,13 @@ export function useToolkitBearer() {
 }
 
 /**
- * Wrap a `fetch` init object so the resulting request carries a fresh
- * `Authorization: Bearer <toolkit-bearer>` header.  Preserves any other
- * headers on the input init.  Throws if the toolkit refuses to issue a
- * bearer (typically because the user is not activated).
+ * Wrap a `fetch` init object with a fresh `Authorization: Bearer <toolkit-bearer>`
+ * header. Preserves any other headers/fields on the input init. Throws if
+ * the toolkit refuses to issue a bearer (typically: user not activated).
  *
  * @param {RequestInit} [init={}] -- baseline fetch init
  * @returns {Promise<RequestInit>}
  */
 export async function withToolkitBearer(init = {}) {
-  const token = await getToolkitBearer();
-  const headers = new Headers(init.headers || {});
-  headers.set("Authorization", `Bearer ${token}`);
-  return { ...init, headers };
+  return buildBearerInit(await getToolkitBearer(), init);
 }
