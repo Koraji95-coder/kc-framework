@@ -6,6 +6,31 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [2.7.3] - 2026-05-18
+
+### Added
+
+- **Activation dev-mode bypass for debug builds.** When
+  `ACTIVATION_DRIVE_FILE_ID` / `ACTIVATION_DRIVE_API_KEY` are not set
+  at build time, debug builds now accept the PIN `R3P-DEV-DEV`
+  unconditionally and issue a local activation token with a 2099
+  expiry. Release builds are unchanged -- the `env!()` macros still
+  hard-fail when the vars are missing.
+- **`docs/ACTIVATION_SETUP.md`** -- canonical setup guide covering
+  the three build-time env vars (`ACTIVATION_HMAC_SECRET`,
+  `ACTIVATION_DRIVE_FILE_ID`, `ACTIVATION_DRIVE_API_KEY`), the
+  debug-build dev-mode workflow, production Drive registry setup,
+  Google Cloud API key issuance, GitHub Actions release wiring,
+  and the common-errors troubleshooting table.
+
+### Changed
+
+- **`ActivationGate.jsx` spelling normalized to US English.**
+  'Activate your licence' -> 'Activate your license',
+  'Licence PIN' -> 'License PIN'. Chamber 19 standardizes on US
+  English across the consumer surface.
+
+
 ## [2.7.2] - 2026-05-17
 
 ### Fixed

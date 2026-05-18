@@ -78,7 +78,7 @@ function PinForm({ onSuccess }) {
       <AnvilMark className="activation-logo" />
 
       <div className="activation-card">
-        <h1 className="activation-heading">Activate your licence</h1>
+        <h1 className="activation-heading">Activate your license</h1>
         <p className="activation-subtext">
           Enter the PIN issued to you by your administrator. The PIN is verified
           once and cached locally — no network call is needed after first activation.
@@ -86,7 +86,7 @@ function PinForm({ onSuccess }) {
 
         <form onSubmit={handleSubmit} style={{ display: "contents" }}>
           <label className="activation-input-label">
-            <span>Licence PIN</span>
+            <span>License PIN</span>
             <input
               className="activation-input"
               type="text"

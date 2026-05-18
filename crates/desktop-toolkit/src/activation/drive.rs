@@ -61,9 +61,33 @@ pub struct DriveKeyEntry {
 /// or the PIN is not found in the file.
 pub async fn lookup_pin(pin: &str) -> Result<DriveKeyEntry, String> {
     if DRIVE_FILE_ID.is_empty() || DRIVE_API_KEY.is_empty() {
-        return Err(
-            "Activation Drive credentials not configured (ACTIVATION_DRIVE_FILE_ID / ACTIVATION_DRIVE_API_KEY not set at build time)".to_string(),
-        );
+        // Debug builds with no Drive credentials fall back to a dev-mode
+        // PIN check so a fresh clone can pass the activation gate without
+        // a Google Cloud round-trip. The accepted PIN is "R3P-DEV-DEV" so
+        // it's obviously a dev artifact; the issued/expires dates put the
+        // local activation token a year out. RELEASE BUILDS NEVER REACH
+        // THIS PATH -- the env!() macros in token.rs / drive.rs are
+        // compile-errors when the vars are unset in --release.
+        #[cfg(debug_assertions)]
+        {
+            if pin == "R3P-DEV-DEV" {
+                return Ok(DriveKeyEntry {
+                    name: "Developer (dev-bypass)".to_string(),
+                    active: true,
+                    issued: Some("2026-01-01".to_string()),
+                    expires: Some("2099-12-31".to_string()),
+                });
+            }
+            return Err(
+                "Activation Drive credentials not configured. In debug builds you can activate with the dev PIN 'R3P-DEV-DEV'. For production, set ACTIVATION_DRIVE_FILE_ID and ACTIVATION_DRIVE_API_KEY at build time -- see docs/ACTIVATION_SETUP.md.".to_string(),
+            );
+        }
+        #[cfg(not(debug_assertions))]
+        {
+            return Err(
+                "Activation Drive credentials not configured (ACTIVATION_DRIVE_FILE_ID / ACTIVATION_DRIVE_API_KEY not set at build time)".to_string(),
+            );
+        }
     }
 
     let url = format!(

@@ -1,6 +1,6 @@
 {
   "name": "@chamber-19/desktop-toolkit",
-  "version": "2.7.2",
+  "version": "2.7.3",
   "description": "Shared JS/React primitives for chamber-19 desktop tools",
   "license": "MIT",
   "type": "module",
