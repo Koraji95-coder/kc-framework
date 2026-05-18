@@ -1,6 +1,6 @@
 {
   "name": "@chamber-19/desktop-toolkit",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "description": "Shared JS/React primitives for chamber-19 desktop tools",
   "license": "MIT",
   "type": "module",
@@ -24,7 +24,8 @@
     "./ai/messages": "./src/ai/AiChatMessages.jsx",
     "./ai/input": "./src/ai/AiChatInput.jsx",
     "./ai/meta": "./src/ai/AiChatMeta.jsx",
-    "./ai/error": "./src/ai/AiChatError.jsx"
+    "./ai/error": "./src/ai/AiChatError.jsx",
+    "./dashboard": "./src/dashboard/index.js"
   },
   "bin": {
     "desktop-toolkit-sync-installer-assets": "./build-scripts/sync-installer-assets.mjs"

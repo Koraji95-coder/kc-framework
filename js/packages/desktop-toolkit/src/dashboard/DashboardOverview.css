@@ -1,0 +1,246 @@
+/*
+ * DashboardOverview.css -- deep-dive aesthetic (zinc palette, calm, technical).
+ *
+ * Inherits palette tokens from the consumer's globals when present
+ * (--bg, --bg-card, --text, --border, --accent-blue, etc.) and falls back to
+ * hex literals so the dashboard renders correctly even in apps that haven't
+ * adopted the toolkit theme system.
+ */
+
+.ch-dash {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  background: var(--bg, #09090b);
+  color: var(--text, #fafafa);
+  font-family: var(--font-body, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  font-size: 13px;
+  line-height: 1.5;
+  min-height: 100%;
+}
+
+.ch-dash-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border, #27272a);
+}
+
+.ch-dash-header-main {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.ch-dash-title {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.ch-dash-broker-url {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  color: var(--text-muted, #71717a);
+}
+
+.ch-dash-identity {
+  font-size: 11px;
+  color: var(--text-muted, #71717a);
+}
+
+.ch-dash-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ch-dash-stale {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  color: var(--text-muted, #71717a);
+}
+
+.ch-dash-refresh {
+  font: inherit;
+  color: var(--text, #fafafa);
+  background: transparent;
+  border: 1px solid var(--border, #27272a);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 150ms, border-color 150ms;
+}
+.ch-dash-refresh:hover {
+  background: var(--bg-card-hover, #27272a);
+  border-color: var(--border-strong, #3f3f46);
+}
+.ch-dash-refresh:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ch-dash-error {
+  padding: 10px 14px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.08);
+  border-radius: 8px;
+  color: #fca5a5;
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 12px;
+}
+
+.ch-dash-empty {
+  padding: 32px;
+  text-align: center;
+  color: var(--text-muted, #71717a);
+  font-size: 13px;
+  border: 1px dashed var(--border, #27272a);
+  border-radius: 8px;
+}
+
+/* -- Stat grid -------------------------------------------------------- */
+
+.ch-dash-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.ch-dash-stat {
+  background: var(--bg-card, #18181b);
+  border: 1px solid var(--border, #27272a);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.ch-dash-stat-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted, #71717a);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+
+.ch-dash-stat-value {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 18px;
+  font-weight: 500;
+}
+
+/* -- Panel + list rows ------------------------------------------------- */
+
+.ch-dash-panel {
+  background: var(--bg-card, #18181b);
+  border: 1px solid var(--border, #27272a);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+.ch-dash-panel-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  margin: 0 0 12px;
+  color: var(--text, #fafafa);
+}
+
+.ch-dash-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ch-dash-row {
+  display: grid;
+  grid-template-columns: 12px 1fr auto;
+  gap: 10px;
+  align-items: start;
+  padding: 8px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+.ch-dash-row:last-child {
+  border-bottom: none;
+}
+
+.ch-dash-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ch-dash-row-title {
+  font-size: 13px;
+  color: var(--text, #fafafa);
+  font-weight: 500;
+}
+
+.ch-dash-row-sub {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  color: var(--text-muted, #71717a);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ch-dash-row-desc {
+  font-size: 12px;
+  color: var(--text-secondary, #a1a1aa);
+  margin-top: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.ch-dash-row-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-end;
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  color: var(--text-muted, #71717a);
+}
+
+.ch-dash-tag {
+  display: inline-block;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+}
+
+/* -- Layer dots (match deep-dive sidebar) ------------------------------ */
+
+.ch-dash-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  margin-top: 6px;
+}
+.ch-dash-dot-blue    { background: #3b82f6; }
+.ch-dash-dot-emerald { background: #10b981; }
+.ch-dash-dot-purple  { background: #8b5cf6; }
+.ch-dash-dot-amber   { background: #f59e0b; }
+.ch-dash-dot-red     { background: #ef4444; }
+.ch-dash-dot-cyan    { background: #06b6d4; }

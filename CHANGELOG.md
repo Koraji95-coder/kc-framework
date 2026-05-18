@@ -6,6 +6,68 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [2.7.0] - 2026-05-17
+
+### Added
+
+- **`<DashboardOverview>` + `useFoundryDashboard()`** -- the toolkit
+  now ships a Foundry broker dashboard component that any consumer
+  app can mount. Polls the broker every 5s (configurable) and renders
+  broker health, registered lanes, recent usage summary, and provider
+  reachability in a calm zinc-palette layout matching the rest of the
+  org's UI.
+
+  The headless hook returns the raw data shape so apps can build
+  their own custom views; the drop-in component is the easy-mode
+  default that mirrors what launcher's Ops tab will use.
+
+  Usage (drop-in):
+  ```jsx
+  import { DashboardOverview } from "@chamber-19/desktop-toolkit/dashboard";
+  <DashboardOverview brokerUrl="http://127.0.0.1:57420" apiKey="..." />
+  ```
+
+  Usage (custom):
+  ```jsx
+  import { useFoundryDashboard } from "@chamber-19/desktop-toolkit/dashboard";
+  const { data, error, refresh } = useFoundryDashboard({ brokerUrl, apiKey });
+  // render your own UI from `data`
+  ```
+
+  Optional `filter={{ lanes: [...] }}` prop narrows the lane list so
+  individual apps can mount a panel showing only their own activity.
+
+- **Standalone dev preview at `preview/dashboard/`** -- a tiny Vite
+  app that mounts `<DashboardOverview>` with broker URL + API key
+  inputs in a header. Run `npm install && npm run dev` from
+  `preview/dashboard/` and the dashboard opens on port 5190 pointed
+  at whatever broker you configure. Useful for iterating on the
+  component without launcher, and for ops debugging on a fresh
+  workstation that doesn't have launcher installed.
+
+- New JS package export: `./dashboard` -> `./src/dashboard/index.js`.
+
+### Changed
+
+- npm + Cargo + PyPI all bump 2.6.0 -> 2.7.0 in lockstep.
+
+### Why this exists
+
+Each Chamber 19 app currently has no shared way to surface broker
+state -- which lanes exist, what they cost, which tools are
+registered, what's reachable. The dashboard centralises that view in
+one component the launcher hosts as the "everything" overview and
+individual apps can mount as narrower per-lane views (e.g., Glyphic
+mounts `<DashboardOverview filter={{ lanes: ["glyphic-vault"] }} />`
+in its settings panel).
+
+Future phases:
+  - D2 -- add any missing Foundry endpoints (tool registry, SSE
+    events stream) for richer real-time visibility
+  - D3 -- launcher mounts the component as a new "Ops" tab (one PR)
+  - D4 -- add React Flow node-graph view for the bifrost-style
+    visualization the user requested
+  - D5 -- per-app narrow mounts in CEP / Glyphic / DLM / TB
 ## [2.6.0] - 2026-05-17
 
 ### Added
